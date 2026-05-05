@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "Hash": "3b45o1cSCQKSkM8dyjFTKGvdazRjAlVmeMVf7ZylkCc=",
+  "Source": "ModaLink.Api",
+  "BasePath": "_content/ModaLink.Api",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}
