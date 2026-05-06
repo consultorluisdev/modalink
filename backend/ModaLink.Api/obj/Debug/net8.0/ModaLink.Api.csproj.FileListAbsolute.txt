@@ -226,3 +226,4 @@
 /home/luis/dev-lf/ModaLink/backend/ModaLink.Api/obj/Debug/net8.0/ModaLink.Api.pdb
 /home/luis/dev-lf/ModaLink/backend/ModaLink.Api/obj/Debug/net8.0/ModaLink.Api.genruntimeconfig.cache
 /home/luis/dev-lf/ModaLink/backend/ModaLink.Api/obj/Debug/net8.0/ref/ModaLink.Api.dll
+/home/luis/dev-lf/ModaLink/backend/ModaLink.Api/obj/Debug/net8.0/ModaLink.Api.sourcelink.json
