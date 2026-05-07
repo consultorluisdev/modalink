@@ -16,13 +16,14 @@ export default function Products(){
   }
 
   return(
-    <div className=" flex justify-between items-center mb-6">
-      <h1 className="text-2xl font-bold">Produtos</h1>
-
-      <Link to="/produtos/novo" 
-      className="bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800">
-        Novo Produto
-      </Link>
+    <div>
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold">Produtos</h1>
+        <Link to="/produtos/novo" 
+        className="bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800">
+          Novo Produto
+        </Link>
+      </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
         {products.map((p) => (
@@ -36,7 +37,6 @@ export default function Products(){
           </div>
         ))}
       </div>
-
     </div>
   )
 }

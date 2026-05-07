@@ -26,7 +26,7 @@ const Login: React.FC = () => {
             login(token, user);
             navigate("/dashboard", { replace: true });
         } catch (err: any) {
-            const erroMessage = err.response?.data || "Erro ao fazer login";
+            const erroMessage = err.response?.data?.message || "Erro ao fazer login";
             setError(erroMessage);
         } finally {
             setLoading(false);

@@ -3090,11 +3090,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/home/luis/dev-lf/ModaLink/backend/ModaLink.Api/ModaLink.Api.csproj",
+      "projectUniqueName": "/mnt/projetos/apps/modalink/backend/ModaLink.Api/ModaLink.Api.csproj",
       "projectName": "ModaLink.Api",
-      "projectPath": "/home/luis/dev-lf/ModaLink/backend/ModaLink.Api/ModaLink.Api.csproj",
+      "projectPath": "/mnt/projetos/apps/modalink/backend/ModaLink.Api/ModaLink.Api.csproj",
       "packagesPath": "/home/luis/.nuget/packages/",
-      "outputPath": "/home/luis/dev-lf/ModaLink/backend/ModaLink.Api/obj/",
+      "outputPath": "/mnt/projetos/apps/modalink/backend/ModaLink.Api/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "/home/luis/.nuget/NuGet/NuGet.Config"
