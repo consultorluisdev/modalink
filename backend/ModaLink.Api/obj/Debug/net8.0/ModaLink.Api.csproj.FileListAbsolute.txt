@@ -342,3 +342,4 @@
 /mnt/projetos/apps/modalink/backend/ModaLink.Api/obj/Debug/net8.0/ModaLink.Api.pdb
 /mnt/projetos/apps/modalink/backend/ModaLink.Api/obj/Debug/net8.0/ModaLink.Api.genruntimeconfig.cache
 /mnt/projetos/apps/modalink/backend/ModaLink.Api/obj/Debug/net8.0/ref/ModaLink.Api.dll
+/mnt/projetos/apps/modalink/backend/ModaLink.Api/bin/Debug/net8.0/ModaLink.Api.staticwebassets.runtime.json

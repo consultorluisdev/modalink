@@ -46,13 +46,14 @@ export const Register: React.FC = () => {
         <div className="min-h-screen flex items-center justify-center bg-gray-100">
             <div className="max-w-md w-full space-y-8 p-8 bg-white rounded-2xl shadow-lg">
                 {/* HEADER */}
-                <div>
-                    <h2 className="text-center text-4xl font-bold text-gray-900">
-                        ModaLink
-                    </h2>
-                    <p className="mt-2 text-center text-sm text-gray-500">
-                        Crie sua conta
-                    </p>
+                <div className="text-center">
+                    <div className="mx-auto w-16 h-16 bg-indigo-600 rounded-2xl flex items-center justify-center mb-4">
+                        <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
+                    </div>
+                    <h1 className="text-3xl font-bold text-indigo-600">ModaLink</h1>
+                    <p className="mt-1 text-sm text-gray-500">Crie sua conta</p>
                 </div>
                 {/* FORM */}
                 <form className="space-y-5" onSubmit={handleSubmit}>

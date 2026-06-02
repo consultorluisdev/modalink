@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   postgres:
     image: postgres:15
@@ -13,6 +11,43 @@ services:
       - "5434:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d modalink_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: ../backend/ModaLink.Api
+      dockerfile: dockerfile
+    container_name: modalink_api
+    restart: always
+    ports:
+      - "5020:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://0.0.0.0:8080
+      ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=modalink_db;Username=admin;Password=admin123"
+      Jwt__Key: "CHAVE_SUPER_SEGURA_COM_PELO_MENOS_32_CARACTERES_AQUI!"
+      Jwt__Issuer: "ModaLink"
+      Jwt__Audience: "ModaLinkApp"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  frontend:
+    image: node:22-alpine
+    container_name: modalink_frontend
+    restart: always
+    working_dir: /app
+    command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
+    ports:
+      - "5173:5173"
+    volumes:
+      - ../frontend/modalink-frontend:/app
+    depends_on:
+      - api
 
   pgadmin:
     image: dpage/pgadmin4
@@ -23,6 +58,8 @@ services:
       PGADMIN_DEFAULT_PASSWORD: admin123
     ports:
       - "5050:80"
+    depends_on:
+      - postgres
 
 volumes:
   postgres_data:

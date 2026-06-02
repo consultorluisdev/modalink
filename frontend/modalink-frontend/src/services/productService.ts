@@ -5,8 +5,9 @@ export const getProducts = async () => {
   return res.data;
 };
 
-export const createProduct = async (data: any) => {
-  const res = await api.post("/products", data);
+export const createProduct = async (data: FormData) => {
+  const res = await api.post("/products", data, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
   return res.data;
-}
-
+};

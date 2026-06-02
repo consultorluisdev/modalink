@@ -1,0 +1,41 @@
+{
+  "Files": [
+    {
+      "Id": "/mnt/projetos/apps/modalink/backend/ModaLink.Api/wwwroot/assets/index-BSvczihJ.css",
+      "PackagePath": "staticwebassets/assets/index-BSvczihJ.css"
+    },
+    {
+      "Id": "/mnt/projetos/apps/modalink/backend/ModaLink.Api/wwwroot/assets/index-ETkEwdQv.js",
+      "PackagePath": "staticwebassets/assets/index-ETkEwdQv.js"
+    },
+    {
+      "Id": "/mnt/projetos/apps/modalink/backend/ModaLink.Api/wwwroot/favicon.svg",
+      "PackagePath": "staticwebassets/favicon.svg"
+    },
+    {
+      "Id": "/mnt/projetos/apps/modalink/backend/ModaLink.Api/wwwroot/icons.svg",
+      "PackagePath": "staticwebassets/icons.svg"
+    },
+    {
+      "Id": "/mnt/projetos/apps/modalink/backend/ModaLink.Api/wwwroot/index.html",
+      "PackagePath": "staticwebassets/index.html"
+    },
+    {
+      "Id": "obj/Debug/net8.0/staticwebassets/msbuild.ModaLink.Api.Microsoft.AspNetCore.StaticWebAssets.props",
+      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssets.props"
+    },
+    {
+      "Id": "obj/Debug/net8.0/staticwebassets/msbuild.build.ModaLink.Api.props",
+      "PackagePath": "build\\ModaLink.Api.props"
+    },
+    {
+      "Id": "obj/Debug/net8.0/staticwebassets/msbuild.buildMultiTargeting.ModaLink.Api.props",
+      "PackagePath": "buildMultiTargeting\\ModaLink.Api.props"
+    },
+    {
+      "Id": "obj/Debug/net8.0/staticwebassets/msbuild.buildTransitive.ModaLink.Api.props",
+      "PackagePath": "buildTransitive\\ModaLink.Api.props"
+    }
+  ],
+  "ElementsToRemove": []
+}
