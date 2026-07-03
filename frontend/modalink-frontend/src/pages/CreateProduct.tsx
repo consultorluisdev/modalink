@@ -34,7 +34,7 @@ export default function CreateProduct() {
       formData.append("description", description);
       formData.append("category", category);
       formData.append("stock", stock);
-      if (image) formData.append("imageUrl", image);
+      if (image) formData.append("Image", image);
 
       await createProduct(formData);
       navigate("/produtos");

@@ -12,20 +12,19 @@ export function Orders() {
     const [selectedOrderId, setSelectedOrderId] = useState<number | null>(null);
 
     useEffect(() => {
+        const loadOrders = async () => {
+            try {
+                setLoading(true);
+                const data = await orderService.getAll(search);
+                setOrders(data);
+            } catch (error) {
+                console.error('Erro ao carregar pedidos:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
         loadOrders();
     }, [search]);
-
-    const loadOrders = async () => {
-        try {
-            setLoading(true);
-            const data = await orderService.getAll(search);
-            setOrders(data);
-        } catch (error) {
-            console.error('Erro ao carregar pedidos:', error);
-        } finally {
-            setLoading(false);
-        }
-    };
 
     const formatCurrency = (value: number) => {
         return value.toLocaleString('pt-BR', {

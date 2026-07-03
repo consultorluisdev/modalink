@@ -18,10 +18,6 @@ export default function Catalogo() {
   const [loading, setLoading] = useState(true);
   const [cart, setCart] = useState<{ id: number; name: string; price: number } | null>(null);
 
-  useEffect(() => {
-    loadProducts();
-  }, []);
-
   async function loadProducts() {
     try {
       const data = await getProducts();
@@ -32,6 +28,10 @@ export default function Catalogo() {
       setLoading(false);
     }
   }
+
+  useEffect(() => {
+    loadProducts();
+  }, []);
 
   const filtered = products.filter((p) =>
     p.title.toLowerCase().includes(search.toLowerCase())

@@ -26,13 +26,8 @@ export function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  useEffect(() => {
-    loadStats();
-  }, []);
-
   async function loadStats() {
     try {
-      setLoading(true);
       setError("");
       const stats = await getDashboardStats();
       setData(stats);
@@ -42,6 +37,10 @@ export function Dashboard() {
       setLoading(false);
     }
   }
+
+  useEffect(() => {
+    loadStats();
+  }, []);
 
   const formatCurrency = (value: number) =>
     value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });

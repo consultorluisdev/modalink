@@ -4,6 +4,13 @@ import { Search, Plus, Minus, Trash2, ShoppingCart, ArrowLeft, DollarSign, Badge
 import { getProducts } from "../../services/productService";
 import { orderService } from "../../services/orderServices";
 
+interface Product {
+  id: number;
+  title: string;
+  price: number;
+  imageUrl: string;
+}
+
 interface CartItem {
   productId: number;
   productName: string;
@@ -14,7 +21,7 @@ interface CartItem {
 export default function NovaVenda() {
   const navigate = useNavigate();
 
-  const [products, setProducts] = useState<any[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
   const [search, setSearch] = useState("");
   const [cart, setCart] = useState<CartItem[]>([]);
   const [customerName, setCustomerName] = useState("");
@@ -25,17 +32,12 @@ export default function NovaVenda() {
   const [downPayment, setDownPayment] = useState(0);
   const [interestRate, setInterestRate] = useState(3);
   const [discount, setDiscount] = useState(0);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
 
-  useEffect(() => {
-    loadProducts();
-  }, []);
-
   async function loadProducts() {
     try {
-      setLoading(true);
       const data = await getProducts();
       setProducts(data);
     } catch {
@@ -45,11 +47,15 @@ export default function NovaVenda() {
     }
   }
 
+  useEffect(() => {
+    loadProducts();
+  }, []);
+
   const filteredProducts = products.filter((p) =>
     p.title.toLowerCase().includes(search.toLowerCase())
   );
 
-  function addToCart(product: any) {
+  function addToCart(product: Product) {
     setCart((prev) => {
       const existing = prev.find((item) => item.productId === product.id);
       if (existing) {

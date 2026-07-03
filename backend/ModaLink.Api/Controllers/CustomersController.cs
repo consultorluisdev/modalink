@@ -143,6 +143,38 @@ public class CustomersController : ControllerBase
 
         return Ok(new { customer.Id, customer.Name });
     }
+
+    [HttpPut("{id}")]
+    public async Task<IActionResult> Update(int id, CreateCustomerDto dto)
+    {
+        var customer = await _context.Customers.FindAsync(id);
+        if (customer == null)
+            return NotFound(new { message = "Cliente nao encontrado" });
+
+        customer.Name = dto.Name;
+        customer.Email = dto.Email;
+        customer.Phone = dto.Phone;
+        customer.WhatsApp = dto.WhatsApp;
+        customer.Instagram = dto.Instagram;
+        customer.BirthDate = dto.BirthDate;
+        customer.Notes = dto.Notes;
+        customer.CreditLimit = dto.CreditLimit;
+
+        await _context.SaveChangesAsync();
+        return Ok(new { customer.Id, customer.Name });
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Delete(int id)
+    {
+        var customer = await _context.Customers.FindAsync(id);
+        if (customer == null)
+            return NotFound(new { message = "Cliente nao encontrado" });
+
+        _context.Customers.Remove(customer);
+        await _context.SaveChangesAsync();
+        return Ok(new { message = "Cliente removido" });
+    }
 }
 
 public class CreateCustomerDto

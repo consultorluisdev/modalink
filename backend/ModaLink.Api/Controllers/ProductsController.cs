@@ -62,4 +62,63 @@ public class ProductsController : ControllerBase
 
         return Ok(product);
     }
+
+    [HttpGet("{id}")]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetById(int id)
+    {
+        var product = await _context.Products.FindAsync(id);
+        if (product == null)
+            return NotFound(new { message = "Produto nao encontrado" });
+        return Ok(product);
+    }
+
+    [HttpPut("{id}")]
+    [Authorize]
+    public async Task<IActionResult> Update(int id, [FromForm] ProductCreateDto dto)
+    {
+        var product = await _context.Products.FindAsync(id);
+        if (product == null)
+            return NotFound(new { message = "Produto nao encontrado" });
+
+        product.Title = dto.Title;
+        product.Description = dto.Description;
+        product.Price = dto.Price;
+        product.Category = dto.Category;
+        product.Stock = dto.Stock;
+        product.UpdatedAt = DateTime.UtcNow;
+
+        if (dto.Image != null)
+        {
+            var folder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/uploads");
+            if (!Directory.Exists(folder))
+                Directory.CreateDirectory(folder);
+
+            var filename = Guid.NewGuid().ToString() + Path.GetExtension(dto.Image.FileName);
+            var path = Path.Combine(folder, filename);
+
+            using (var stream = new FileStream(path, FileMode.Create))
+            {
+                await dto.Image.CopyToAsync(stream);
+            }
+
+            product.ImageUrl = "/uploads/" + filename;
+        }
+
+        await _context.SaveChangesAsync();
+        return Ok(product);
+    }
+
+    [HttpDelete("{id}")]
+    [Authorize]
+    public async Task<IActionResult> Delete(int id)
+    {
+        var product = await _context.Products.FindAsync(id);
+        if (product == null)
+            return NotFound(new { message = "Produto nao encontrado" });
+
+        _context.Products.Remove(product);
+        await _context.SaveChangesAsync();
+        return Ok(new { message = "Produto removido" });
+    }
 }

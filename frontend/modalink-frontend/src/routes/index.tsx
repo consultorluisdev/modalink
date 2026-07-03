@@ -11,6 +11,8 @@ import Clientes from "../pages/clientes/Clientes";
 import IAVendas from "../pages/ia-vendas/IAVendas";
 import Catalogo from "../pages/catalogo/Catalogo";
 import Financeiro from "../pages/financeiro/Financeiro";
+import Reports from "../pages/Reports";
+import Settings from "../pages/Settings";
 import MainLayout from "../layouts/MainLayout";
 
 const ProtectedLayout = () => (
@@ -38,6 +40,8 @@ export default function AppRoutes() {
           <Route path="/clientes" element={<Clientes />} />
           <Route path="/financeiro" element={<Financeiro />} />
           <Route path="/ia-vendas" element={<IAVendas />} />
+          <Route path="/configuracoes" element={<Settings />} />
+          <Route path="/relatorios" element={<Reports />} />
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
         </Route>
       </Routes>

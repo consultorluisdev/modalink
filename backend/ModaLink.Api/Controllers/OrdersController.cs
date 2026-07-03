@@ -132,7 +132,8 @@ public class OrdersController : ControllerBase
                 ProductName = i.Product?.Title ?? "",
                 i.Quantity,
                 i.UnitPrice,
-                TotalPrice = i.TotalPrice
+                TotalPrice = i.TotalPrice,
+                subtotal = i.TotalPrice
             }),
             Installments = order.Installments.Select(i => new
             {
@@ -227,7 +228,29 @@ public class OrdersController : ControllerBase
                 order.Installments.Last().Amount += diff;
         }
 
+        // validate stock
+        foreach (var item in order.Items)
+        {
+            var product = await _context.Products.FindAsync(item.ProductId);
+            if (product == null)
+                return BadRequest(new { message = $"Produto ID {item.ProductId} nao encontrado" });
+            if (product.Stock < item.Quantity)
+                return BadRequest(new { message = $"Estoque insuficiente para {product.Title}. Disponivel: {product.Stock}" });
+        }
+
         _context.Orders.Add(order);
+        await _context.SaveChangesAsync();
+
+        // decrement stock
+        foreach (var item in order.Items)
+        {
+            var product = await _context.Products.FindAsync(item.ProductId);
+            if (product != null)
+            {
+                product.Stock -= item.Quantity;
+                product.UpdatedAt = DateTime.UtcNow;
+            }
+        }
         await _context.SaveChangesAsync();
 
         return Ok(new { order.Id, order.Total, order.Status });

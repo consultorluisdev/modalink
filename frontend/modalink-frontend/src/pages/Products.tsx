@@ -18,13 +18,8 @@ export default function Products() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  useEffect(() => {
-    loadProducts();
-  }, []);
-
   async function loadProducts() {
     try {
-      setLoading(true);
       setError("");
       const data = await getProducts();
       setProducts(data);
@@ -34,6 +29,10 @@ export default function Products() {
       setLoading(false);
     }
   }
+
+  useEffect(() => {
+    loadProducts();
+  }, []);
 
   if (loading) {
     return (

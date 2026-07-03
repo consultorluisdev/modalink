@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "DfaYMxlU3u/NSj5qHlHZEOgX+/94pMZdAukPl5ezwjAXTj+VMKdHLRjTMAHp1mGuwsM6ohX7hWvTbQcDGCJgCw==",
+  "dgSpecHash": "ivg56bhsNyqVXIgIQe8zynL3OjpD45rytxBJboawrLBN8qsX8s9nbF4K534LJbBgXXCGgq/KTW80WGXbaF+eCw==",
   "success": true,
   "projectFilePath": "/mnt/projetos/apps/modalink/backend/ModaLink.Api/ModaLink.Api.csproj",
   "expectedPackageFiles": [

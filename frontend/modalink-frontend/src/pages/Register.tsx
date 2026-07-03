@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import api from "../services/api";
+import type { AxiosError } from "axios";
 
 export const Register: React.FC = () => {
     const [name, setName] = useState("");
@@ -34,9 +35,9 @@ export const Register: React.FC = () => {
             replace: true,
             state: {message: "Cadastro realizado com sucesso! Faça login."}
            });
-        } catch (err: any) {
-            const erroMessage = err.response?.data?.message || "Erro ao cadastrar";
-            setError(erroMessage);
+        } catch (err: unknown) {
+            const axiosError = err as AxiosError<{ message: string }>;
+            setError(axiosError.response?.data?.message || "Erro ao cadastrar");
         } finally {
             setLoading(false);
         }

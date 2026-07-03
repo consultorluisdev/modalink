@@ -14,20 +14,19 @@ export function OrderDetailModal({ orderId, onClose }: OrderDetailModalProps) {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+        const loadOrder = async () => {
+            try {
+                setLoading(true);
+                const data = await orderService.getById(orderId);
+                setOrder(data);
+            } catch (error) {
+                console.error('Erro ao carregar detalhes do pedido:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
         loadOrder();
     }, [orderId]);
-
-    const loadOrder = async () => {
-        try {
-            setLoading(true);
-            const data = await orderService.getById(orderId);
-            setOrder(data);
-        } catch (error) {
-            console.error('Erro ao carregar detalhes do pedido:', error);
-        } finally {
-            setLoading(false);
-        }
-    };
 
     const formatCurrency = (value: number) => {
         return value.toLocaleString('pt-BR', {

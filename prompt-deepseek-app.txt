@@ -1,0 +1,74 @@
+Crie um app React Native com Expo 56 para exibir o catálogo de produtos de uma loja de roupas chamada ModaLink.
+
+**Tecnologias:**
+- Expo SDK 56, React Native 0.85, TypeScript
+- Axios para API
+- React Navigation (stack navigator)
+- Nao usar Expo Router, usar React Navigation puro
+
+**API:**
+- Base URL: http://localhost:5020/api
+- Auth: POST /auth/login { email, password } => { token, userName, userEmail }
+- Products: GET /products (publico, retorna array)
+- Product detail: GET /products/{id}
+- Imagens: http://localhost:5020{imageUrl}
+
+**Modelo Product:**
+{
+  id: number,
+  title: string,
+  description: string,
+  price: number,
+  imageUrl: string | null,
+  category: string | null,
+  stock: number,
+  createdAt: string,
+  updatedAt: string
+}
+
+**Telas:**
+
+1. **LoginScreen** - fundo cinza claro, logo ModaLink (icone de raio roxo), campos email/senha, botao "Entrar" preto, link "Criar conta". Salvar token no AsyncStorage e redirecionar pro catalogo.
+
+2. **RegisterScreen** - campos nome, email, senha, confirmar senha. Chamar POST /auth/register { name, email, password }. Voltar pro login com mensagem de sucesso.
+
+3. **CatalogScreen** - FlatList de produtos em grid de 2 colunas, cada card com:
+   - Imagem do produto (ou placeholder cinza se imageUrl for null)
+   - Nome do produto
+   - Preco em R$
+   - Botao "Ver detalhes"
+   - SearchBar no topo para filtrar por nome
+   - Pull-to-refresh
+
+4. **ProductDetailScreen** - Imagem grande no topo, nome, preco, descricao, categoria, estoque. Botao "Voltar" no header.
+
+**Telas de Autenticacao (Login/Register):**
+- Devem usar React Navigation em um stack separado (AuthStack)
+- Apos login, navegar para o AppStack (Catalog + Detail)
+- Usar Context API para gerenciar estado de autenticacao (AuthContext com login, logout, isAuthenticated, user)
+
+**Requisitos adicionais:**
+- loading indicator enquanto carrega dados
+- tratar erros de rede com Alert
+- pull-to-refresh no catalogo
+- imagem placeholder quando product.imageUrl for null
+- preco formatado em R$ (ex: R$ 129,90)
+
+**Estilo:**
+- Design minimalista, clean, tons de cinza e preto
+- Cards com bordas arredondadas, sombra leve
+- Header roxo escuro (#1e1b4b) com nome ModaLink
+- Fonte padrao do sistema
+
+**Estrutura de pastas:**
+src/
+  contexts/AuthContext.tsx
+  services/api.ts
+  screens/LoginScreen.tsx
+  screens/RegisterScreen.tsx
+  screens/CatalogScreen.tsx
+  screens/ProductDetailScreen.tsx
+  navigation/AppNavigator.tsx
+App.tsx
+
+Gere o codigo completo de todos os arquivos listados acima.

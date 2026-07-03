@@ -13,6 +13,7 @@ public class AppDbContext : DbContext
     public DbSet<Order> Orders { get; set; }
     public DbSet<OrderItem> OrderItems { get; set; }
     public DbSet<Installment> Installments { get; set; }
+    public DbSet<StoreSetting> StoreSettings { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -44,6 +45,11 @@ public class AppDbContext : DbContext
                 .WithMany()
                 .HasForeignKey(i => i.ProductId)
                 .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<StoreSetting>(entity =>
+        {
+            entity.HasIndex(s => s.Id);
         });
 
         modelBuilder.Entity<Installment>(entity =>

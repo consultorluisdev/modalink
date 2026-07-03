@@ -2,6 +2,7 @@ import React, { useState } from "react"
 import { Link, useNavigate } from "react-router-dom";
 import api from "../services/api";
 import { useAuth } from "../hooks/useAuth";
+import type { AxiosError } from "axios";
 
 
 const Login: React.FC = () => {
@@ -25,9 +26,9 @@ const Login: React.FC = () => {
 
             login(token, user);
             navigate("/dashboard", { replace: true });
-        } catch (err: any) {
-            const erroMessage = err.response?.data?.message || "Erro ao fazer login";
-            setError(erroMessage);
+        } catch (err: unknown) {
+            const axiosError = err as AxiosError<{ message: string }>;
+            setError(axiosError.response?.data?.message || "Erro ao fazer login");
         } finally {
             setLoading(false);
         }
