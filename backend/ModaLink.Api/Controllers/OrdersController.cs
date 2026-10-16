@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using ModaLink.Api.Models;
+using ModaLink.Api.Data;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -237,22 +237,32 @@ public class OrdersController : ControllerBase
             if (product.Stock < item.Quantity)
                 return BadRequest(new { message = $"Estoque insuficiente para {product.Title}. Disponivel: {product.Stock}" });
         }
-
-        _context.Orders.Add(order);
-        await _context.SaveChangesAsync();
-
-        // decrement stock
-        foreach (var item in order.Items)
+        // transaçao única
+        using var transaction = await _context.Database.BeginTransactionAsync();
+        try
         {
-            var product = await _context.Products.FindAsync(item.ProductId);
-            if (product != null)
-            {
-                product.Stock -= item.Quantity;
-                product.UpdatedAt = DateTime.UtcNow;
-            }
-        }
-        await _context.SaveChangesAsync();
+            _context.Orders.Add(order);
+            await _context.SaveChangesAsync();
 
-        return Ok(new { order.Id, order.Total, order.Status });
+            // decrement stock dentro da mesma transação
+            foreach (var item in order.Items)
+            {
+                var product = await _context.Products.FindAsync(item.ProductId);
+                if(product != null)
+                {
+                    product.Stock -= item.Quantity;
+                    product.UpdatedAt = DateTime.UtcNow;
+                }
+            }
+            await _context.SaveChangesAsync();
+
+            await transaction.CommitAsync();
+        }
+        catch
+        {
+            await transaction.RollbackAsync();
+            throw;
+        }
+        return Ok(new {order.Id, order.Total, order.Status });
     }
 }

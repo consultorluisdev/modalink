@@ -5,7 +5,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using ModaLink.Api.Models;
+using ModaLink.Api.Data;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -118,7 +118,7 @@ public class AuthController : ControllerBase
 
     // LIST USERS (admin)
     [HttpGet("users")]
-    [Authorize]
+    [Authorize(Roles = "Administrador")]
     public async Task<IActionResult> GetUsers()
     {
         var users = await _context.Users
@@ -137,7 +137,7 @@ public class AuthController : ControllerBase
 
     // TOGGLE USER ACTIVE
     [HttpPatch("users/{id}/toggle-active")]
-    [Authorize]
+    [Authorize(Roles = "Administrador")]
     public async Task<IActionResult> ToggleUserActive(int id)
     {
         var user = await _context.Users.FindAsync(id);
@@ -151,7 +151,7 @@ public class AuthController : ControllerBase
 
     // CREATE USER (admin)
     [HttpPost("users")]
-    [Authorize]
+    [Authorize(Roles = "Administrador")]
     public async Task<IActionResult> CreateUser(RegisterDto dto)
     {
         if (await _context.Users.AnyAsync(x => x.Email == dto.Email))

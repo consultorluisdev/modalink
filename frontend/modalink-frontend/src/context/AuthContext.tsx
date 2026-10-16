@@ -5,9 +5,11 @@ const TOKEN_KEY = "token";
 const USER_KEY = "user";
 
 export interface User{
-    id: string;
+    id: number;
     name: string;
     email: string;
+    role: string;
+    isActive: boolean;
 }
 
 interface AuthContextType {

@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using ModaLink.Api.Models;
+using ModaLink.Api.Data;
 using System.Text;
 
 
@@ -44,6 +44,8 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
     {
+        var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>()
+                        ?? new[] {"http://localhost:5173", "http://localhost:5020" };
         policy.AllowAnyOrigin()
               .AllowAnyMethod()
               .AllowAnyHeader();

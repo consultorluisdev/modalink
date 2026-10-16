@@ -13,7 +13,7 @@ const Login: React.FC = () => {
 
     const { login } = useAuth();
     const navigate = useNavigate();
-    
+
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -24,7 +24,13 @@ const Login: React.FC = () => {
             const response = await api.post("/auth/login", { email, password });
             const { token, user } = response.data;
 
-            login(token, user);
+            login(token, {
+                id: user.id,
+                name: user.name,
+                email: user.email,
+                role: user.role,
+                isActive: user.isActive
+            });
             navigate("/dashboard", { replace: true });
         } catch (err: unknown) {
             const axiosError = err as AxiosError<{ message: string }>;

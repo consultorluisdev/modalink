@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
-using ModaLink.Api.Models;
+using ModaLink.Api.Data;
 
-namespace ModaLink.Api.Models;
+namespace ModaLink.Api.Data;
 
 public class AppDbContext : DbContext
 {
@@ -44,7 +44,7 @@ public class AppDbContext : DbContext
             entity.HasOne(i => i.Product)
                 .WithMany()
                 .HasForeignKey(i => i.ProductId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.Restrict);
         });
 
         modelBuilder.Entity<StoreSetting>(entity =>

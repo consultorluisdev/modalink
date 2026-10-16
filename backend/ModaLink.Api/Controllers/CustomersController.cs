@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using ModaLink.Api.Models;
+using ModaLink.Api.Data;
 
 [ApiController]
 [Route("api/[controller]")]
