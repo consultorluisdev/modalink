@@ -6,6 +6,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using ModaLink.Api.Data;
+using ModaLink.Api.Models;
 
 [ApiController]
 [Route("api/[controller]")]

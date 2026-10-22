@@ -1,3 +1,4 @@
+namespace ModaLink.Api.Models;
 public class Installment
 {
     public int Id { get; set; }

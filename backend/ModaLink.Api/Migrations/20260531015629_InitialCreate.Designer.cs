@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using ModaLink.Api.Data;
 using ModaLink.Api.Models;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 

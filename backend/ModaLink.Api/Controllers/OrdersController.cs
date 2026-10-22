@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using ModaLink.Api.Models;
 using ModaLink.Api.Data;
 
 [ApiController]
@@ -184,7 +185,7 @@ public class OrdersController : ControllerBase
             Subtotal = subtotal,
             Discount = discount,
             Total = total,
-            Status = dto.PaymentMethod == "Crediário" ? "Pending" : "Completed",
+            Status = "Completed",
             CreatedAt = DateTime.UtcNow,
             InstallmentCount = dto.InstallmentCount,
             DownPayment = dto.DownPayment,

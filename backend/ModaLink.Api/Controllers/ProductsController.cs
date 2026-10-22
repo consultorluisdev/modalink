@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ModaLink.Api.Data;
+using ModaLink.Api.Models;
 using Microsoft.EntityFrameworkCore;
 
 [ApiController]

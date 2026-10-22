@@ -1,4 +1,5 @@
 ﻿using System;
+using ModaLink.Api.Data;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 

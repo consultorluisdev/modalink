@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using ModaLink.Api.Data;
+using ModaLink.Api.Models;
 
 namespace ModaLink.Api.Data;
 

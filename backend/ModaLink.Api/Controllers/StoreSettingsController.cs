@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ModaLink.Api.Data;
+using ModaLink.Api.Models;
 
 [ApiController]
 [Route("api/store-settings")]

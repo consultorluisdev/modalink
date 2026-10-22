@@ -1,3 +1,4 @@
+namespace ModaLink.Api.Models;
 public class StoreSetting
 {
     public int Id { get; set; }
