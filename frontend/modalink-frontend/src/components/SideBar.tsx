@@ -29,7 +29,7 @@ const menuItems = [
   { path: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { path: "/vendas/nova", label: "PDV", icon: PlusCircle },
   { path: "/produtos", label: "Estoque", icon: Package },
-  { path: "/catalogo", label: "Catálogo", icon: Store },
+  { path: "/gestor da loja on-line", label: "Gestor da Loja On-line", icon: Store },
   { path: "/pedidos", label: "Pedidos", icon: ShoppingCart },
   { path: "/clientes", label: "Clientes", icon: Users },
   { path: "/financeiro", label: "Financeiro", icon: DollarSign },

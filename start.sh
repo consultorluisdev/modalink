@@ -1,21 +1,25 @@
 #!/bin/bash
 set -e
 
+ROOT="$(cd "$(dirname "$0")" && pwd)"
+
 echo "🚀 Iniciando ModaLink..."
 
 # 1. Build do frontend
 echo "📦 Compilando frontend..."
-cd "$(dirname "$0")/frontend/modalink-frontend"
+cd "$ROOT/frontend/modalink-frontend"
 npm run build
 
 # 2. Copiar para o backend
 echo "📋 Copiando para o backend..."
-cp -r dist/* ../backend/ModaLink.Api/wwwroot/
+rm -rf "$ROOT/backend/ModaLink.Api/wwwroot"
+mkdir -p "$ROOT/backend/ModaLink.Api/wwwroot"
+cp -r dist/* "$ROOT/backend/ModaLink.Api/wwwroot/"
 
-# 3. Iniciar Docker
-echo "🐳 Iniciando containers..."
-cd ../backend/ModaLink.Api
-docker compose up -d
+# 3. Rebuildar e iniciar Docker
+echo "🐳 Rebuildando e iniciando containers..."
+cd "$ROOT"
+docker compose --env-file .env -f docker/docker-compose.yml up -d --build
 
 echo ""
 echo "✅ ModaLink rodando!"

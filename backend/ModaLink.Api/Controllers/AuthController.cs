@@ -33,7 +33,7 @@ public class AuthController : ControllerBase
             Name = dto.Name,
             Email = dto.Email,
             PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password),
-            Role = dto.Role ?? "Vendedor"
+            Role = "Vendedor"
         };
 
         _context.Users.Add(user);
@@ -54,6 +54,8 @@ public class AuthController : ControllerBase
 
         if (user == null)
             return BadRequest(new { message ="Usuário não encontrado"});
+        if(!user.IsActive)
+            return BadRequest(new { message = "Usuário inativo" });
 
         var senhaValida = BCrypt.Net.BCrypt.Verify(dto.Password, user.PasswordHash);
 

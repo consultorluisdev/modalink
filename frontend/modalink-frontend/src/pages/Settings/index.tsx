@@ -1,4 +1,4 @@
-import React, { FormEvent, ChangeEvent, useState, useEffect } from "react";
+import React, { type FormEvent, type ChangeEvent, useState, useEffect } from "react";
 import { Store, User, Lock, Save, Eye, EyeOff, Key } from "lucide-react";
 import { settingsService } from "../../services/settingsService";
 

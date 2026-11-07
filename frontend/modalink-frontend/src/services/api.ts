@@ -1,7 +1,9 @@
 import axios from "axios";
 
 const api = axios.create({
-    baseURL: `http://${window.location.hostname}:5020/api`,
+    baseURL: import.meta.env.DEV
+        ? `http://${window.location.hostname}:5020/api`
+        : "/api",
 });
 
 api.interceptors.request.use((config) => {

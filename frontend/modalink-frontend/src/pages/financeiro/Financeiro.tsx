@@ -1,8 +1,210 @@
-import { useState, useEffect } from "react";
-import { DollarSign, TrendingUp, AlertTriangle, CalendarCheck, CheckCircle, RotateCcw } from "lucide-react";
+import { useState, useEffect, useMemo } from "react";
+import {
+  AlertTriangle,
+  CalendarCheck,
+  CalendarDays,
+  CheckCircle,
+  Currency,
+  DollarSign,
+  icons,
+  RotateCcw,
+  Search,
+  UserRound,
+  Wallet,
+  X,
+} from 'lucide-react';
 import { useAuth } from "../../hooks/useAuth";
 import { financeiroService } from "../../services/financeiroService";
 import type { ReceivableData } from "../../services/financeiroService";
+import { data } from 'react-router-dom';
+
+type FilterType = "Todas" | "Em aberto" | "Vencidas" | "Recebidas";
+type ReceivableItem = ReceivableData["items"][number];
+
+function formatCurrency(value: number): string {
+  return value.toLocaleStringData("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+  });
+}
+
+function formatData(value: string): string {
+  const date = value.includes("T")
+    ? new Date(value)
+    : new Date(`${value}T12:00:00`);
+
+    return Number.isNaN(date.getTime())
+    ? "_"
+    : date.toLocaleDateString("pt-BR");
+}
+
+function isItemOverdue(item: ReceivableItem): boolean {
+  if (item.isPaid) return false;
+
+  const dueDate = new  Date(item.dueDate);
+  const today = new Date();
+
+  dueDate.setHours(0, 0, 0, 0);
+  today.setHours(0, 0, 0, 0);
+
+  return dueDate < today;
+}
+
+export default function Financeiro() {
+  const [data, setData] = useState<ReceivableData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [error, setError] = useState("");
+  const [payingId, setPayingId] = useState<number | null>(null);
+  const [search, setSearch] = useState("");
+  const [filter, setFilter] = useState<<FilterType>("Todas");
+  const [selectedId, setSelectedId] = useState<number | null>(null)
+}
+
+async funtion loadData(isRefreshig = false){
+  try {
+    if(isRefresh) setRefreshing(true);
+    else setLoading(true);
+
+    setError("");
+    const result = await financeiroService.getReceivable();
+    setData(result);
+
+    setSelectedId((current) => {
+      if(current == null) return null;
+      return result.items.some((item) => item.id === current)
+      ? current
+      : null;
+    });
+  }catch {
+    setError("Não foi possivel carregar os dados financeiros.Tente novamente depois ...");
+  }finally{
+    setLoading(false);
+    setRefreshing(false);
+  }
+}
+
+useEffect(() => {
+  void loadData();
+}, []);
+
+async function handlePay(id: number){
+  if(
+    !window.confirm(
+      "confirma o recibemento desta parcela? Esta ação registrará a baixs no financeiro."
+    )
+  ) return;
+
+  setPayingId(id);
+  setError("");
+
+  try{
+    await financeiroService.payInstallment(id);
+    await loadData(true);
+  }catch {
+    setError("Não foi possivel registrar o recebimento da parcela.");
+  }finally{
+    setPayingId(null);
+  }
+}
+
+async function handleUnPay(id: number) {
+  if(
+    !window.confirm(
+      "Deseja reabrir esta parcela? Confirme somente se o recebimento foi registrado incorreto"
+    )
+  )return;
+
+  setPayingId()
+  setError("");
+
+  try{
+    await financeiroService.unpayInstallment(id);
+    await loadData(true);
+  }catch{
+    setError("Não foi possivel reabrir a parcela.");
+  }finally{
+    setPayingId(null);
+  }
+}
+
+const filteredItems = useMemo(() => {
+  if(!data) return [];
+
+  const normalizedSearch = search.trim().toLocalewerCase("pt-BR");
+
+  return data.items.filter((item) => {
+    const matcheSearch =
+    normalizedSearch.lenght === 0 ||
+    item.customerName.toLocaLowerCase("pt-BR").includes(normalizedSearch) ||
+    String(item.orderId).includes(normalizedSearch);
+
+    const overdue = isItemOverdue(item);
+    const matchesFilter =
+    filter === "Todas" ||
+    (filter === "Recibidas" && item.isPaid) ||
+    (filter === "Vencidas" && overdue) ||
+    (filter === "Em aberto" && !item.isPaid && !overdue);
+
+    return matcheSearch && matchesFilter;
+  });
+}, [data, search, filter]);
+
+const selectedItem =
+data?.items.find((item) => item.id === selectedItem) ?? null;
+
+const summaryCards = [
+  {
+    title: "A receber",
+    value: data?.totalReceivable ?? 0,
+    description: "Total de parcelas em aberto",
+    icon: Wallet,
+    iconClass: "text-violet-700",
+    iconBg: "bg-violet-100",
+    accent: "border-t-emerald-500",
+  },
+  {
+    title: "Recebido no mês",
+    value: data?.totalPaidThisMonth ?? 0,
+    description: "Pagamentos registrado no mês",
+    icon: CheckCircle,
+    iconClass: "text-emerald-700",
+    iconBg: "bg-emerald-100",
+    accent: "border-t-emerald-500",
+  },
+  {
+    title: "Vencido",
+    value: data?.overdue ?? 0,
+    description: "Parcelas em atraso",
+    icon: AlertTriangle,
+    iconClass: "text-red-700",
+    iconBg: "bg-red-100",
+    accent: "border-t-red-500",
+  },
+  {
+    title: "A vencer",
+    value: data?.duoSoon ?? 0,
+    description: "Próximos vencimentos",
+    icon: CheckCircle,
+    iconClass: "text-blue-700",
+    iconBg: "bg-blue-100",
+    accent: "border-t-blue-500",
+  },
+]
+// fanta finalizar
+if()
+
+
+
+
+
+
+
+
+
+
+
+
 
 export default function Financeiro() {
   useAuth();

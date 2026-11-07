@@ -185,7 +185,7 @@ public class OrdersController : ControllerBase
             Subtotal = subtotal,
             Discount = discount,
             Total = total,
-            Status = "Completed",
+            Status = dto.PaymentMethod == "Crediário" && (dto.InstallmentCount ?? 0) > 0 ? "Pending" : "Paid",
             CreatedAt = DateTime.UtcNow,
             InstallmentCount = dto.InstallmentCount,
             DownPayment = dto.DownPayment,
@@ -199,8 +199,10 @@ public class OrdersController : ControllerBase
             }).ToList()
         };
 
+
         if (dto.PaymentMethod == "Crediário" && (dto.InstallmentCount ?? 0) > 0)
         {
+
             var amountToFinance = total;
             if (dto.DownPayment.HasValue && dto.DownPayment.Value > 0)
             {
@@ -249,7 +251,7 @@ public class OrdersController : ControllerBase
             foreach (var item in order.Items)
             {
                 var product = await _context.Products.FindAsync(item.ProductId);
-                if(product != null)
+                if (product != null)
                 {
                     product.Stock -= item.Quantity;
                     product.UpdatedAt = DateTime.UtcNow;
@@ -264,6 +266,6 @@ public class OrdersController : ControllerBase
             await transaction.RollbackAsync();
             throw;
         }
-        return Ok(new {order.Id, order.Total, order.Status });
+        return Ok(new { order.Id, order.Total, order.Status });
     }
 }
