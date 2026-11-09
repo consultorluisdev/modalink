@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ModaLink.Api.Models;
 using ModaLink.Api.Data;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -166,15 +167,38 @@ public class CustomersController : ControllerBase
     }
 
     [HttpDelete("{id}")]
+    [Authorize(Roles = "Administrador")]
     public async Task<IActionResult> Delete(int id)
     {
         var customer = await _context.Customers.FindAsync(id);
         if (customer == null)
             return NotFound(new { message = "Cliente nao encontrado" });
 
-        _context.Customers.Remove(customer);
+        if (!customer.Active)
+            return Ok(new { id = customer.Id, active = false, message = "cliente já está inativo" });
+
+        customer.Active = false;
         await _context.SaveChangesAsync();
-        return Ok(new { message = "Cliente removido" });
+
+        return Ok(new { id = customer.Id, active = false, message = "cliente desativado" });
+
+    }
+
+    [HttpPatch("{id}/reactivate")]
+    [Authorize(Roles = "Administrador")]
+    public async Task<IActionResult> Reactivate(int id)
+    {
+        var customer = await _context.Customers.FindAsync(id);
+        if (customer == null)
+            return NotFound(new { message = "Cliente não encontrado" });
+
+        if (customer.Active)
+            return Ok(new { id = customer.Id, active = true, message = "Cliente já está ativo" });
+        customer.Active = true;
+        await _context.SaveChangesAsync();
+
+        return Ok(new { id = customer.Id, active = true, message = "Cliente reativado" });
+
     }
 }
 
@@ -189,3 +213,4 @@ public class CreateCustomerDto
     public string? Notes { get; set; }
     public decimal? CreditLimit { get; set; }
 }
+
