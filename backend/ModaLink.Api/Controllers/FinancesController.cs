@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using ModaLink.Api.Data;
 using ModaLink.Api.Models;
 
 [ApiController]
@@ -113,17 +114,12 @@ public class FinancesController : ControllerBase
         var order = installment.Order ?? await _context.Orders.FindAsync(installment.OrderId);
         if (order != null && order.PaymentMethod == "Crediário" && (order.InstallmentCount ?? 0) > 0)
         {
-            var allPaid = await _context.Installments
-                .Where(i => i.OrderId == order.Id)
-                .AllAsync(i => i.IsPaid || i.Id == installment.Id); // já marcada acima em memória, mas garantia:
-                                                                    // forma mais segura: recarregar contagem
-            allPaid = !await _context.Installments
+            var allPaid = !await _context.Installments
                 .Where(i => i.OrderId == order.Id && i.Id != installment.Id)
                 .AnyAsync(i => !i.IsPaid);
             if (allPaid)
                 order.Status = "Paid";
         }
-
 
         await _context.SaveChangesAsync();
 
@@ -133,7 +129,9 @@ public class FinancesController : ControllerBase
     [HttpPost("installments/{id}/unpay")]
     public async Task<IActionResult> UnpayInstallment(int id)
     {
-        var installment = await _context.Installments.FindAsync(id);
+        var installment = await _context.Installments
+            .Include(i => i.Order)
+            .FirstOrDefaultAsync(i => i.Id == id);
         if (installment == null)
             return NotFound(new { message = "Parcela não encontrada" });
 

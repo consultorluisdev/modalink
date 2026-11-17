@@ -118,8 +118,20 @@ public class ProductsController : ControllerBase
         if (product == null)
             return NotFound(new { message = "Produto nao encontrado" });
 
+        var hasSales = await _context.OrderItems.AnyAsync(i => i.ProductId == id);
+        if (hasSales)
+            return Conflict(new { message = "Produto possui vendas e nao pode ser excluido" });
+
         _context.Products.Remove(product);
-        await _context.SaveChangesAsync();
+        try
+        {
+            await _context.SaveChangesAsync();
+        }
+        catch (DbUpdateException)
+        {
+            return Conflict(new { message = "Produto possui historico de vendas e nao pode ser excluido" });
+        }
+
         return Ok(new { message = "Produto removido" });
     }
 }
