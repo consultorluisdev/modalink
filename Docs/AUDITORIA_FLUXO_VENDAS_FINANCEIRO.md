@@ -96,19 +96,21 @@ Clientes.tsx → GET/POST/PUT /api/customers
 
 ## 5. Fluxo real de recebimento
 
-- **Resumo:** `GET /api/finances/receivable/summary` (`FinancesController.cs:57-84`).
-- **Lista de parcelas:** `GET /api/finances/receivable` (`:18-55`).
-- **Baixa:** `POST /api/finances/installments/{id}/pay` (`:86-100`).
-- **Reabertura:** `POST /api/finances/installments/{id}/unpay` (`:102-116`).
-- **Total a receber:** soma de `Installments` com `IsPaid == false` (`:27`).
-- **Recebido no mês (lista):** `PaidAt.Month == UtcNow.Month` **sem comparar o ano** (`:29`) — bug.
-- **Recebido no mês (summary):** filtra mês **e** ano corretamente (`:69-71`).
-- **Vencido:** `!IsPaid && DueDate < UtcNow` (`:31`).
-- **A vencer:** `!IsPaid && DueDate >= UtcNow` (`:32`).
-- **Filtros:** no frontend, sobre `data.items` localmente (busca por cliente/venda e abas Todas/Em aberto/Vencidas/Recebidas — `Financeiro.tsx:124-146`). Os cards de resumo **não** são afetados pelos filtros; usam os totais globais da API (`:148-185`).
+- **Resumo:** `GET /api/finances/receivable/summary` (`FinancesController.cs:GetSummary`).
+- **Lista de parcelas:** `GET /api/finances/receivable` (`FinancesController.cs:GetReceivable`).
+- **Baixa:** `POST /api/finances/installments/{id}/pay` (`PayInstallment`).
+- **Reabertura:** `POST /api/finances/installments/{id}/unpay` (`UnpayInstallment`).
+- **Total a receber:** soma de `Installments` com `IsPaid == false`.
+- **Recebido no mês (lista):** **atualizado (16/11/2026):** `GetReceivable` agora considera `PaidAt.Month == UtcNow.Month && PaidAt.Year == UtcNow.Year`. (Antes era bug, só mês.)
+- **Recebido no mês (summary):** filtra mês **e** ano corretamente.
+- **Vencido:** `!IsPaid && DueDate < UtcNow` (cálculo em memória no `receivable`; regras análogas no summary).
+- **A vencer:** `!IsPaid && DueDate >= UtcNow`.
+- **Filtros:** no frontend, sobre `data.items` localmente (busca por cliente/venda e abas Todas/Em aberto/Vencidas/Recebidas). Os cards de resumo usam os totais globais da API.
 - **Data do recebimento:** persistida em `PaidAt` (UTC).
 - **Forma de recebimento:** **não persistida**.
 - **Histórico de recebimentos:** **não existe**. `Unpay` apaga `PaidAt`/`PaidAmount`; nova baixa sobrescreve os valores anteriores.
+- **Baixa (estado atual, parcial):** `PayInstallment` retorna `409` se já paga; valida `Amount` (se enviado: `> 0` e `<= Amount` da parcela). Ao quitar, se pedido for crediário com parcelas, tenta marcar `Order.Status = "Paid"` quando todas parcelas estiverem pagas (lógica a simplificar). `UnpayInstallment` retorna `409` se já aberta; se crediário, define `Order.Status = "Pending"` (implementação mínima; recomendado usar `Include(Order)` como em `Pay` para consistência).
+- **Validação manual pendente (16/11/2026):** alterações de financeiro não validadas em execução hoje.
 
 ---
 
@@ -198,17 +200,17 @@ Conclusão dos testes: **não há cobertura automatizada**; os cenários B–G n
 - Impacto: apagar um produto remove itens de vendas antigas, alterando histórico e relatórios; perda de dados financeiros.
 - Recomendação: criar migration `Cascade → Restrict/NoAction`, soft delete de produto e retorno 409 ao excluir produto vendido.
 
-**P0-02 — Recebimento sem validação/idempotência**
-- Arquivo: `Controllers/FinancesController.cs:86-100` (`PayInstallment`), `:102-116` (`UnpayInstallment`).
-- Evidência: não verifica `IsPaid`, não valida valor (>0, ≤ saldo), não usa transação, sobrescreve `PaidAt`/`PaidAmount`.
-- Impacto: baixa duplicada, sobrepagamento, valores negativos, caixa incorreto, sem rastreabilidade.
-- Recomendação: rejeitar parcela já paga (409), validar valor, registrar `Payment`/histórico, chave de idempotência, transação.
+**P0-02 — Recebimento sem validação/idempotência** (🟡 **parcial em 16/11/2026**)
+- Arquivo: `Controllers/FinancesController.cs` (`PayInstallment`, `UnpayInstallment`).
+- Estado atual: `PayInstallment` retorna **409** se já paga; valida `Amount` (se enviado: `> 0` e `<= Amount` da parcela); ainda **sem histórico imutável (`Payment`)**, **sem transação explícita** além do `SaveChanges`, **sem idempotência** (chave) e ainda pode haver inconsistências de carga (`Unpay` sem `Include(Order)` no fluxo atual observado).
+- Impacto remanescente: risco reduzido para dupla baixa ingênua e valores absurdos, mas ainda sem rastreabilidade completa e sem proteção forte contra corrida.
+- Recomendação: manter validações; adicionar `Payment`/log, transação e idempotência.
 
-**P0-03 — Status da venda não vira `Paid` ao quitar**
-- Arquivo: `Controllers/FinancesController.cs:86-100`; `Controllers/OrdersController.cs:188`.
-- Evidência: `PayInstallment` só altera a parcela; `Order.Status` nunca é recalculado.
-- Impacto: crediário 100% pago continua “Pendente”; tela de Pedidos e dashboard mentem.
-- Recomendação: ao pagar/reabrir, recalcular `Order.Status` (ex.: `Pending`/`Paid`) em transação.
+**P0-03 — Status da venda não vira `Paid` ao quitar** (🟡 **parcial em 16/11/2026**)
+- Arquivo: `Controllers/FinancesController.cs` (`PayInstallment`, `UnpayInstallment`).
+- Estado atual: em crediário, ao pagar tenta marcar `Order.Status = "Paid"` quando todas as parcelas estão pagas; ao reabrir define `Pending` (mínimo). Há lógica redundante/confusa a simplificar e garantir uso consistente de `Order`.
+- Impacto remanescente: melhora, mas não totalmente confiável até revisão/testes.
+- Recomendação: simplificar regra, cobrir casos de borda e testar; considerar transação.
 
 **P0-04 — Entrada não registrada e total da venda divergente**
 - Arquivo: `Controllers/OrdersController.cs:177-232`; `Models/Order.cs:14-16`; `Controllers/FinancesController.cs:27-30`.
@@ -236,8 +238,8 @@ Conclusão dos testes: **não há cobertura automatizada**; os cenários B–G n
 
 ### P1 — Alto (9)
 
-**P1-01 — `totalPaidThisMonth` ignora o ano**
-- `FinancesController.cs:29`. Filtra só `PaidAt.Month`. Impacto: recebido do mês inflado com anos anteriores. Recomendação: comparar mês **e** ano (como no summary).
+**P1-01 — `totalPaidThisMonth` ignora o ano** (✅ **corrigido em 16/11/2026**)
+- `FinancesController.cs` (`GetReceivable`): agora filtra `PaidAt.Month` e `PaidAt.Year` (alinhado ao `GetSummary`).
 
 **P1-02 — `Order.Total` não inclui juros/financiado**
 - `OrdersController.cs:177-232`. Impacto: dashboard/relatórios subestimam recebíveis e vendas reais. Recomendação: persistir e exibir `TotalWithInterest`/`FinancedAmount`.
@@ -371,14 +373,17 @@ Conclusão dos testes: **não há cobertura automatizada**; os cenários B–G n
 
 ## Resumo final
 
-- **Problemas:** P0 = **7** · P1 = **9** · P2 = **11** · P3 = **5** (total **32**).
+- **Problemas (contagem do relatório original):** P0 = **7** · P1 = **9** · P2 = **11** · P3 = **5** (total **32**). **Atualização 16/11/2026:** P1-01 corrigido; P0-02 e P0-03 marcados como **parciais** no backend (ver seções 5 e 9).
 - **Fluxo de vendas:** funcional no caso simples; **não confiável** para operação real (validação, concorrência, histórico e status).
-- **Crediário:** gera parcelas com juros e arredondamento corretos, mas **entrada não é recebimento**, limite não é validado e status não evolui.
-- **Recebimento:** baixa e indicadores funcionam no básico, mas **sem idempotência, validação, forma de pagamento ou histórico**.
-- **Pronto para loja real?** **Não.** Corrigir os P0 antes de liberar clientes reais.
-- **Top 5 prioridades:**
-  1. P0-01 — Corrigir `ON DELETE CASCADE` de produto no banco.
-  2. P0-02 — Baixa de parcela idempotente/validada com registro de pagamento.
+- **Crediário:** gera parcelas com juros e arredondamento corretos, mas **entrada não é recebimento**, limite não é validado e evolução de status é parcial.
+- **Recebimento:** houve melhorias pontuais (mês/ano, 409, validação de amount, tentativa de sync de status do pedido em crediário), mas **ainda falta** idempotência, histórico imutável, forma de pagamento persistida e revisão de consistência.
+- **Pronto para loja real?** **Não.** Corrigir/fechar os P0 críticos antes de liberar clientes reais (incluindo P0-1, P0-2 completo, P0-4, P0-5, P0-6/validações).
+- **Top 5 prioridades (reafirmadas):**
+  1. P0-01 — Corrigir `ON DELETE CASCADE` de produto no banco (validar estado real).
+  2. P0-02 — Baixa de parcela idempotente/validada com registro de pagamento (concluir o parcial).
   3. P0-04 — Registrar entrada e reconciliar `Total` × parcelas.
-  4. P0-03 — Atualizar status do pedido ao quitar.
-  5. P0-05 + P0-06 — Concorrência de estoque e validação de venda.
+  4. P0-03 — Atualizar status do pedido ao quitar (concluir o parcial).
+  5. P0-05 + P0-06 — Concorrência de estoque e validação de venda (`CreateOrder`).
+
+### Atualização em andamento — 16/11/2026
+- Pendente no código (conferir diff): P0-1 (`/auth/register` público), P0-2, P0-5. Ajustes finos em `FinancesController.Pay/Unpay` (simplificar lógica `allPaid`, usar `Include(Order)` em `Unpay`).

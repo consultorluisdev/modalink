@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using ModaLink.Api.Data;
+using ModaLink.Api.Models;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -26,7 +26,9 @@ public class FinancesController : ControllerBase
 
         var totalReceivable = installments.Where(i => !i.IsPaid).Sum(i => i.Amount);
         var totalPaidThisMonth = installments
-            .Where(i => i.IsPaid && i.PaidAt.HasValue && i.PaidAt.Value.Month == DateTime.UtcNow.Month)
+            .Where(i => i.IsPaid && i.PaidAt.HasValue
+            && i.PaidAt.Value.Month == DateTime.UtcNow.Month
+            && i.PaidAt.Value.Year == DateTime.UtcNow.Year)
             .Sum(i => i.PaidAmount ?? i.Amount);
         var overdue = installments.Where(i => !i.IsPaid && i.DueDate < DateTime.UtcNow).Sum(i => i.Amount);
         var dueSoon = installments.Where(i => !i.IsPaid && i.DueDate >= DateTime.UtcNow).Sum(i => i.Amount);
@@ -86,13 +88,42 @@ public class FinancesController : ControllerBase
     [HttpPost("installments/{id}/pay")]
     public async Task<IActionResult> PayInstallment(int id, [FromBody] PayInstallmentDto? dto)
     {
-        var installment = await _context.Installments.FindAsync(id);
+        var installment = await _context.Installments
+        .Include(i => i.Order)
+        .FirstOrDefaultAsync(i => i.Id == id);
+
         if (installment == null)
             return NotFound(new { message = "Parcela não encontrada" });
 
+        if(installment.IsPaid)
+            return Conflict(new { message = "Parcela já está paga"});
+
+        if(dto?.Amount is not null)
+        {
+            if(dto.Amount <= 0)
+                return BadRequest(new { message = "Valor informado deve ser maior que zero" });
+            if(dto.Amount > installment.Amount)
+                return BadRequest(new { message = "Valor informado não pode ser maior que o valor da parcela"}
+            );
+        }
         installment.IsPaid = true;
         installment.PaidAt = DateTime.UtcNow;
         installment.PaidAmount = dto?.Amount ?? installment.Amount;
+
+        var order = installment.Order ?? await _context.Orders.FindAsync(installment.OrderId);
+        if (order != null && order.PaymentMethod == "Crediário" && (order.InstallmentCount ?? 0) > 0)
+        {
+            var allPaid = await _context.Installments
+                .Where(i => i.OrderId == order.Id)
+                .AllAsync(i => i.IsPaid || i.Id == installment.Id); // já marcada acima em memória, mas garantia:
+                                                                    // forma mais segura: recarregar contagem
+            allPaid = !await _context.Installments
+                .Where(i => i.OrderId == order.Id && i.Id != installment.Id)
+                .AnyAsync(i => !i.IsPaid);
+            if (allPaid)
+                order.Status = "Paid";
+        }
+
 
         await _context.SaveChangesAsync();
 
@@ -106,9 +137,19 @@ public class FinancesController : ControllerBase
         if (installment == null)
             return NotFound(new { message = "Parcela não encontrada" });
 
+        if(!installment.IsPaid)
+            return Conflict(new { message = "Parcela já está em aberto"});
+
         installment.IsPaid = false;
         installment.PaidAt = null;
         installment.PaidAmount = null;
+
+        var order = installment.Order ?? await _context.Orders.FindAsync(installment.OrderId);
+        if(order != null && order.PaymentMethod == "Crediário" && (order.InstallmentCount ?? 0) > 0)
+        {
+            // voltou a ter aberta
+            order.Status = "Pending";
+        }
 
         await _context.SaveChangesAsync();
 

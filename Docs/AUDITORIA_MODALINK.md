@@ -40,16 +40,25 @@ O ModaLink é um **MVP funcional de PDV single-tenant** com catálogo, crediári
 | Clientes | 🟡 só listagem | ✅ reescrito (criar, editar, busca, detalhe, totais) | `clientes/Clientes.tsx` |
 | Menu → Catálogo | ✅ `/catalogo` | 🔴 aponta para rota inexistente | `SideBar.tsx:32` |
 | Retry de Relatórios | 🔴 no-op | 🔴 continua no-op | `Reports/index.tsx:69,99` |
-| Registro público força `Vendedor` | ✅ | ✅ (mas ver novo risco R1) | `AuthController.cs:36` |
+| Registro público força `Vendedor` | ✅ | ✅ | `AuthController.cs:36` |
 | Login bloqueia inativo | ✅ | ✅ | `AuthController.cs:57` |
+| `GET /finances/receivable` (recebido no mês) | 🔴 somava só mês (bug) | ✅ considera mês **e ano** (`DateTime.UtcNow.Month/Year`) | `FinancesController.cs` (`GetReceivable`) |
+| Baixa de parcela (`PayInstallment`) | 🟡 sem validação forte | 🟡 rejeita se já paga (409), valida `Amount > 0` e `<=` valor da parcela; tenta atualizar status do pedido crediário ao quitar | `FinancesController.cs:PayInstallment` |
+| Reabrir parcela (`UnpayInstallment`) | 🟡 sem bloqueio | 🟡 rejeita se já aberta (409); crediário volta status para `Pending` (implementação mínima) | `FinancesController.cs:UnpayInstallment` |
+
+### Atualização em andamento — 16/11/2026 (working tree)
+
+- **Aplicado parcialmente (backend):** `FinancesController` — correção de “recebido no mês” no `receivable`, validações/409 em pay/unpay e lógica de status do pedido crediário ao pagar/reabrir (revisão recomendada: simplificar checagem de “todas pagas” em `Pay` e usar `Include(Order)` também em `Unpay` para consistência).
+- **Ainda pendente (não confirmado como aplicado):** **P0-1** (`POST /api/auth/register` ainda público no estado observado), **P0-2** validações de `CreateOrderDto`/regras em `OrdersController`, **P0-5** revalidação de estoque dentro da transação.
+- **Git (atenção):** há muitas deleções em `mobile/modalink-mobile/node_modules/*` e arquivos não versionados (`Docs/`, `catalog/`, novas migrations e `Payment.cs` etc.). Não commitar lixo; revisar antes de `git add/commit`.
 
 ### Top riscos atuais (P0)
 
-1. 🔴 **Registro público aberto + RBAC fraco** — qualquer pessoa cria um `Vendedor` e passa a ler clientes, pedidos e financeiro. Ver **R1**.
+1. 🔴 **Registro público aberto + RBAC fraco** — qualquer pessoa cria um `Vendedor` e passa a ler clientes, pedidos e financeiro (P0-1). Ver **R1**.
 2. 🔴 **Validação de entrada ausente** — senha vazia, quantidade/preço negativos, desconto > subtotal, parcelas inválidas. Ver **R2**.
 3. 🔴 **Multi-tenancy ausente** — uma instância = uma loja; sem isolamento de dados.
 4. 🔴 **Rate limiting ausente** — brute force em login/registro.
-5. 🟡 **Concorrência de estoque** — validação fora da transação; dois pedidos podem vender o mesmo item.
+5. 🟡 **Concorrência de estoque** — validação fora da transação; dois pedidos podem vender o mesmo item (P0-5).
 6. 🟡 **JWT de 7 dias sem refresh/revogação** — desativar usuário não invalida tokens já emitidos.
 
 ### Novas regressões introduzidas nos últimos commits
