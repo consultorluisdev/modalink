@@ -10,4 +10,5 @@ public class Installment
     public bool IsPaid { get; set; }
     public DateTime? PaidAt { get; set; }
     public decimal? PaidAmount { get; set; }
+    public List<Payment> Payments { get; set; } = new();
 }

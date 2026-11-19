@@ -14,6 +14,10 @@ public class Order
     public int? InstallmentCount { get; set; }
     public decimal? DownPayment { get; set; }
     public decimal? InterestRate { get; set; }
+    public decimal? FinancedAmount { get; set; }
+    public decimal? InterestAmount { get; set; }
+    public decimal? TotalWithInterest { get; set; }
     public List<OrderItem> Items { get; set; } = new();
     public List<Installment> Installments { get; set; } = new();
+    public List<Payment> Payments { get; set; } = new();
 }

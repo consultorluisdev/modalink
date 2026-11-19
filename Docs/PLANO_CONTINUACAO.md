@@ -1,6 +1,7 @@
 # Tarefas — próxima sessão
 
 > Salvo em 17/11/2026. Retomar daqui.
+> **Plano detalhado da Fase 1 (P0):** `Docs/PLANO_EXECUCAO_FASE_1.md` (criado em 18/11/2026).
 
 ## Estado atual
 - Fase 0 concluída e commitada (`e41f68a8`):
@@ -11,6 +12,7 @@
 - Auditorias de referência:
   - `Docs/AUDITORIA_FLUXO_VENDAS_FINANCEIRO.md` (P0-01..P0-07)
   - `Docs/AUDITORIA_MODALINK.md` (P0-1..P0-17)
+- **18/11/2026 — schema reconciliado:** o banco já tinha `20261113125223_FixProductDeleteBehavior` e `20261113130537_AddOrderFinancialsAndPayments` aplicadas (build de 13/11). As migrations foram recuperadas por decompilação do DLL do container; modelo/snapshot alinhados (`has-pending-model-changes` limpo). **P0-01 concluído**; schema de `Payment` + campos financeiros pronto — falta a lógica nos controllers.
 
 ## Decisões pendentes (com default recomendado)
 1. Escopo "finalizar tudo": só P0 do fluxo + regressões frontend (recomendado). Multi-tenancy = épico separado.
@@ -22,19 +24,14 @@
 7. `bin/obj` rastreados: restaurar (feito) ou remover do Git (`git rm -r --cached`)?
 
 ## Fase 1 — P0 backend (ordem)
-1. **P0-01 (finalizar)** — migration `RestrictProductOrderItems`:
-   - `dotnet ef migrations add RestrictProductOrderItems` (NÃO editar InitialCreate).
-   - Up: DropForeignKey + AddForeignKey `ReferentialAction.Restrict` em `FK_OrderItems_Products_ProductId`.
-   - Snapshot deve virar `Restrict` (EF atualiza).
-   - Aplicar no boot (`Program.cs:59` já roda `Migrate()`).
-   - Validar: `confdeltype = 'r'`; DELETE produto com venda → 409.
+1. **P0-01 (concluído em 18/11)** — migration `FixProductDeleteBehavior` recuperada; FK em `Restrict`; 409 mantido.
 2. **P0-02** — `Payment` imutável + idempotência:
-   - Model `Payment` (InstallmentId, Amount, Method?, PaidAt, UserId?, CreatedAt) + migration.
-   - `PayInstallment`: transação, insere Payment + atualiza Installment; 409 se já paga.
-   - `UnpayInstallment`: registra estorno (não apaga histórico).
+   - [x] Schema: model `Payment` (InstallmentId, Amount, Method?, PaidAt, UserId?, IdempotencyKey?, ReversedAt?) + migration + backfill.
+   - [ ] `PayInstallment`: transação, insere Payment + atualiza Installment; 409 se já paga.
+   - [ ] `UnpayInstallment`: registra estorno (não apaga histórico).
 3. **P0-04** — entrada + reconciliação:
-   - Order: `FinancedAmount`, `InterestAmount`, `TotalWithInterest`, `DownPaymentPaidAt` + migration.
-   - Registrar entrada como recebimento e incluir no "recebido no mês".
+   - [x] Schema: `FinancedAmount`, `InterestAmount`, `TotalWithInterest` + backfill (sem `DownPaymentPaidAt`; entrada via `Payment` com `InstallmentId = null`).
+   - [ ] Registrar entrada como recebimento e incluir no "recebido no mês".
 4. **P0-05** — concorrência de estoque:
    - `ExecuteUpdateAsync` condicional dentro da transação; checar linhas afetadas; sem N+1.
 5. **P0-06** — validação:

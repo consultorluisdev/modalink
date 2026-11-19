@@ -3,7 +3,6 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using ModaLink.Api.Models;
 using ModaLink.Api.Data;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -23,7 +22,7 @@ namespace ModaLink.Api.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("Customer", b =>
+            modelBuilder.Entity("ModaLink.Api.Models.Customer", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -67,7 +66,7 @@ namespace ModaLink.Api.Migrations
                     b.ToTable("Customers");
                 });
 
-            modelBuilder.Entity("Installment", b =>
+            modelBuilder.Entity("ModaLink.Api.Models.Installment", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -105,7 +104,7 @@ namespace ModaLink.Api.Migrations
                     b.ToTable("Installments");
                 });
 
-            modelBuilder.Entity("Order", b =>
+            modelBuilder.Entity("ModaLink.Api.Models.Order", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -126,8 +125,16 @@ namespace ModaLink.Api.Migrations
                     b.Property<decimal?>("DownPayment")
                         .HasColumnType("numeric");
 
+                    b.Property<decimal?>("FinancedAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
+
                     b.Property<int?>("InstallmentCount")
                         .HasColumnType("integer");
+
+                    b.Property<decimal?>("InterestAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
 
                     b.Property<decimal?>("InterestRate")
                         .HasColumnType("numeric");
@@ -148,6 +155,10 @@ namespace ModaLink.Api.Migrations
                         .HasPrecision(18, 2)
                         .HasColumnType("numeric(18,2)");
 
+                    b.Property<decimal?>("TotalWithInterest")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("CustomerId");
@@ -155,7 +166,7 @@ namespace ModaLink.Api.Migrations
                     b.ToTable("Orders");
                 });
 
-            modelBuilder.Entity("OrderItem", b =>
+            modelBuilder.Entity("ModaLink.Api.Models.OrderItem", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -189,7 +200,55 @@ namespace ModaLink.Api.Migrations
                     b.ToTable("OrderItems");
                 });
 
-            modelBuilder.Entity("Product", b =>
+            modelBuilder.Entity("ModaLink.Api.Models.Payment", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("Amount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
+
+                    b.Property<string>("IdempotencyKey")
+                        .HasColumnType("text");
+
+                    b.Property<int?>("InstallmentId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Method")
+                        .HasColumnType("text");
+
+                    b.Property<int>("OrderId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("PaidAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("ReversedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("UserId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IdempotencyKey")
+                        .IsUnique()
+                        .HasFilter("\"IdempotencyKey\" IS NOT NULL");
+
+                    b.HasIndex("InstallmentId");
+
+                    b.HasIndex("OrderId");
+
+                    b.HasIndex("PaidAt");
+
+                    b.ToTable("Payments");
+                });
+
+            modelBuilder.Entity("ModaLink.Api.Models.Product", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -229,7 +288,7 @@ namespace ModaLink.Api.Migrations
                     b.ToTable("Products");
                 });
 
-            modelBuilder.Entity("StoreSetting", b =>
+            modelBuilder.Entity("ModaLink.Api.Models.StoreSetting", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -260,7 +319,7 @@ namespace ModaLink.Api.Migrations
                     b.ToTable("StoreSettings");
                 });
 
-            modelBuilder.Entity("User", b =>
+            modelBuilder.Entity("ModaLink.Api.Models.User", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -295,9 +354,9 @@ namespace ModaLink.Api.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("Installment", b =>
+            modelBuilder.Entity("ModaLink.Api.Models.Installment", b =>
                 {
-                    b.HasOne("Order", "Order")
+                    b.HasOne("ModaLink.Api.Models.Order", "Order")
                         .WithMany("Installments")
                         .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -306,9 +365,9 @@ namespace ModaLink.Api.Migrations
                     b.Navigation("Order");
                 });
 
-            modelBuilder.Entity("Order", b =>
+            modelBuilder.Entity("ModaLink.Api.Models.Order", b =>
                 {
-                    b.HasOne("Customer", "Customer")
+                    b.HasOne("ModaLink.Api.Models.Customer", "Customer")
                         .WithMany("Orders")
                         .HasForeignKey("CustomerId")
                         .OnDelete(DeleteBehavior.SetNull);
@@ -316,18 +375,18 @@ namespace ModaLink.Api.Migrations
                     b.Navigation("Customer");
                 });
 
-            modelBuilder.Entity("OrderItem", b =>
+            modelBuilder.Entity("ModaLink.Api.Models.OrderItem", b =>
                 {
-                    b.HasOne("Order", "Order")
+                    b.HasOne("ModaLink.Api.Models.Order", "Order")
                         .WithMany("Items")
                         .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Product", "Product")
+                    b.HasOne("ModaLink.Api.Models.Product", "Product")
                         .WithMany()
                         .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Order");
@@ -335,16 +394,41 @@ namespace ModaLink.Api.Migrations
                     b.Navigation("Product");
                 });
 
-            modelBuilder.Entity("Customer", b =>
+            modelBuilder.Entity("ModaLink.Api.Models.Payment", b =>
+                {
+                    b.HasOne("ModaLink.Api.Models.Installment", "Installment")
+                        .WithMany("Payments")
+                        .HasForeignKey("InstallmentId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("ModaLink.Api.Models.Order", "Order")
+                        .WithMany("Payments")
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Installment");
+
+                    b.Navigation("Order");
+                });
+
+            modelBuilder.Entity("ModaLink.Api.Models.Customer", b =>
                 {
                     b.Navigation("Orders");
                 });
 
-            modelBuilder.Entity("Order", b =>
+            modelBuilder.Entity("ModaLink.Api.Models.Installment", b =>
+                {
+                    b.Navigation("Payments");
+                });
+
+            modelBuilder.Entity("ModaLink.Api.Models.Order", b =>
                 {
                     b.Navigation("Installments");
 
                     b.Navigation("Items");
+
+                    b.Navigation("Payments");
                 });
 #pragma warning restore 612, 618
         }
