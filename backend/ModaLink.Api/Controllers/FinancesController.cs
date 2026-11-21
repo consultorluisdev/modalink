@@ -186,8 +186,3 @@ public class FinancesController : ControllerBase
         });
     }
 }
-
-public class PayInstallmentDto
-{
-    public decimal? Amount { get; set; }
-}
