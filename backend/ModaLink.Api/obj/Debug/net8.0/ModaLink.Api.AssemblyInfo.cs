@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("ModaLink.Api")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+9f21e1a5638fa59ebfc74ce37525fadb29bba46c")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+930a19bf6fcd552f8a4258500642f0746337bfad")]
 [assembly: System.Reflection.AssemblyProductAttribute("ModaLink.Api")]
 [assembly: System.Reflection.AssemblyTitleAttribute("ModaLink.Api")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
