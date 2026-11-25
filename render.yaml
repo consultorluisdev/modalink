@@ -1,0 +1,33 @@
+services:
+  - type: web
+    name: modalink-api
+    runtime: docker
+    rootDir: backend/ModaLink.Api
+    dockerfilePath: ./dockerfile
+    dockerContext: .
+    plan: free
+    region: ohio
+    healthCheckPath: /health
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: modalink-db
+          property: connectionString
+      - key: Jwt__Key
+        generateValue: true
+      - key: Jwt__Issuer
+        value: ModaLink
+      - key: Jwt__Audience
+        value: ModaLinkUsers
+      - key: Cors__AllowedOrigins__0
+        value: https://modalink-frontend.vercel.app
+
+databases:
+  - name: modalink-db
+    databaseName: modalink_db
+    user: modalink_user
+    plan: free
+    region: ohio
+    postgresMajorVersion: "16"

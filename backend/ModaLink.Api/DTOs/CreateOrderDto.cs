@@ -18,7 +18,7 @@ public class CreateOrderDto
     public decimal? DownPayment { get; set; }
     [Range(typeof(decimal), "0", "79228162514264337593543950335")]
     public decimal? InterestRate { get; set; }
-    [MinLength(1)]
+    [Required, MinLength(1)]
     public List<CreateOrderItemDto> Items { get; set; } = new();
 }
 
