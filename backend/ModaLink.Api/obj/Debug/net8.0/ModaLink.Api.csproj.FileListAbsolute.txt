@@ -462,3 +462,7 @@
 /home/ubuntu-pc/lf-cloud/projects/modalink/backend/ModaLink.Api/obj/Debug/net8.0/ModaLink.F20E5816.Up2Date
 /home/ubuntu-pc/lf-cloud/projects/modalink/backend/ModaLink.Api/obj/Debug/net8.0/ModaLink.Api.genruntimeconfig.cache
 /home/ubuntu-pc/lf-cloud/projects/modalink/backend/ModaLink.Api/obj/Debug/net8.0/ref/ModaLink.Api.dll
+/home/ubuntu-pc/lf-cloud/projects/modalink/backend/ModaLink.Api/bin/Debug/net8.0/Microsoft.Extensions.Caching.Memory.dll
+/home/ubuntu-pc/lf-cloud/projects/modalink/backend/ModaLink.Api/bin/Debug/net8.0/Microsoft.Extensions.DependencyInjection.Abstractions.dll
+/home/ubuntu-pc/lf-cloud/projects/modalink/backend/ModaLink.Api/bin/Debug/net8.0/Microsoft.Extensions.Logging.Abstractions.dll
+/home/ubuntu-pc/lf-cloud/projects/modalink/backend/ModaLink.Api/bin/Debug/net8.0/Microsoft.Extensions.Options.dll

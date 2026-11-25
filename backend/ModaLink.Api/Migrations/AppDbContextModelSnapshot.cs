@@ -22,6 +22,77 @@ namespace ModaLink.Api.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("ModaLink.Api.Models.CashExpense", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("Amount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
+
+                    b.Property<int>("CashRegisterId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)");
+
+                    b.Property<int?>("UserId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CashRegisterId");
+
+                    b.ToTable("CashExpenses");
+                });
+
+            modelBuilder.Entity("ModaLink.Api.Models.CashRegister", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime?>("ClosedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<decimal?>("ClosingAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
+
+                    b.Property<DateTime>("OpenedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<decimal>("OpeningAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId", "Status")
+                        .IsUnique()
+                        .HasFilter("\"Status\" = 'Open'");
+
+                    b.ToTable("CashRegisters");
+                });
+
             modelBuilder.Entity("ModaLink.Api.Models.Customer", b =>
                 {
                     b.Property<int>("Id")
@@ -111,6 +182,12 @@ namespace ModaLink.Api.Migrations
                         .HasColumnType("integer");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CancellationReason")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("CancelledAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -212,6 +289,9 @@ namespace ModaLink.Api.Migrations
                         .HasPrecision(18, 2)
                         .HasColumnType("numeric(18,2)");
 
+                    b.Property<int?>("CashRegisterId")
+                        .HasColumnType("integer");
+
                     b.Property<string>("IdempotencyKey")
                         .HasColumnType("text");
 
@@ -234,6 +314,8 @@ namespace ModaLink.Api.Migrations
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CashRegisterId");
 
                     b.HasIndex("IdempotencyKey")
                         .IsUnique()
@@ -354,6 +436,28 @@ namespace ModaLink.Api.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("ModaLink.Api.Models.CashExpense", b =>
+                {
+                    b.HasOne("ModaLink.Api.Models.CashRegister", "CashRegister")
+                        .WithMany("Expenses")
+                        .HasForeignKey("CashRegisterId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CashRegister");
+                });
+
+            modelBuilder.Entity("ModaLink.Api.Models.CashRegister", b =>
+                {
+                    b.HasOne("ModaLink.Api.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("ModaLink.Api.Models.Installment", b =>
                 {
                     b.HasOne("ModaLink.Api.Models.Order", "Order")
@@ -396,6 +500,11 @@ namespace ModaLink.Api.Migrations
 
             modelBuilder.Entity("ModaLink.Api.Models.Payment", b =>
                 {
+                    b.HasOne("ModaLink.Api.Models.CashRegister", "CashRegister")
+                        .WithMany()
+                        .HasForeignKey("CashRegisterId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
                     b.HasOne("ModaLink.Api.Models.Installment", "Installment")
                         .WithMany("Payments")
                         .HasForeignKey("InstallmentId")
@@ -407,9 +516,16 @@ namespace ModaLink.Api.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.Navigation("CashRegister");
+
                     b.Navigation("Installment");
 
                     b.Navigation("Order");
+                });
+
+            modelBuilder.Entity("ModaLink.Api.Models.CashRegister", b =>
+                {
+                    b.Navigation("Expenses");
                 });
 
             modelBuilder.Entity("ModaLink.Api.Models.Customer", b =>

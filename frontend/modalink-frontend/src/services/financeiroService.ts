@@ -4,6 +4,7 @@ export interface InstallmentItem {
     id: number;
     installmentNumber: number;
     amount: number;
+    originalAmount: number;
     dueDate: string;
     isPaid: boolean;
     paidAt: string | null;
@@ -39,8 +40,8 @@ export const financeiroService = {
         return response.data;
     },
 
-    async payInstallment(id: number, amount?: number) {
-        const response = await api.post(`/finances/installments/${id}/pay`, { amount });
+    async payInstallment(id: number, amount: number, method: string) {
+        const response = await api.post(`/finances/installments/${id}/pay`, { amount, method });
         return response.data;
     },
 

@@ -1,2 +1,96 @@
 @import "tailwindcss";
 
+@theme {
+  --color-indigo-50: #faf5ff;
+  --color-indigo-100: #f3e8ff;
+  --color-indigo-200: #e9d5ff;
+  --color-indigo-300: #d8b4fe;
+  --color-indigo-400: #c084fc;
+  --color-indigo-500: #a855f7;
+  --color-indigo-600: #8b28cc;
+  --color-indigo-700: #7628bd;
+  --color-indigo-800: #542080;
+  --color-indigo-900: #3f155e;
+  --color-indigo-950: #29113d;
+}
+
+.erp-shell {
+  color: #321647;
+}
+
+.erp-shell :is(input:not([type="checkbox"]):not([type="radio"]), select, textarea) {
+  border-color: #e8dff0;
+  border-radius: 0.75rem;
+  color: #321647;
+  transition: border-color 150ms ease, box-shadow 150ms ease, background-color 150ms ease;
+}
+
+.erp-shell :is(input:not([type="checkbox"]):not([type="radio"]), select, textarea)::placeholder {
+  color: #a293ad;
+}
+
+.erp-shell :is(input:not([type="checkbox"]):not([type="radio"]), select, textarea):focus {
+  border-color: #a855d1;
+  box-shadow: 0 0 0 3px rgb(168 85 209 / 13%);
+  outline: none;
+}
+
+.erp-shell :is(h1, h2, h3) {
+  color: #29113d;
+  letter-spacing: -0.025em;
+}
+
+.erp-shell table thead {
+  background-color: #faf8fc;
+}
+
+.erp-shell table th {
+  color: #786782;
+  font-weight: 700;
+}
+
+.erp-shell table tbody tr {
+  transition: background-color 150ms ease;
+}
+
+.erp-shell .bg-white[class*="border"] {
+  border-color: #eee7f4;
+}
+
+.erp-shell button:not(:disabled),
+.erp-shell a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+@media (max-width: 640px) {
+  .erp-shell :is(input:not([type="checkbox"]):not([type="radio"]), select) {
+    min-height: 2.75rem;
+  }
+}
+
+@media print {
+  @page {
+    size: 80mm auto;
+    margin: 4mm;
+  }
+
+  body * {
+    visibility: hidden !important;
+  }
+
+  .sales-receipt-print,
+  .sales-receipt-print * {
+    visibility: visible !important;
+  }
+
+  .sales-receipt-print {
+    position: fixed !important;
+    inset: 0 auto auto 0 !important;
+    display: block !important;
+    width: 72mm !important;
+    padding: 0 !important;
+    color: #000 !important;
+    background: #fff !important;
+    font-family: Arial, sans-serif !important;
+  }
+}

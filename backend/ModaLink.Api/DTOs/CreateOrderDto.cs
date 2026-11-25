@@ -16,6 +16,8 @@ public class CreateOrderDto
     public int? InstallmentCount { get; set; }
     [Range(typeof(decimal), "0", "79228162514264337593543950335")]
     public decimal? DownPayment { get; set; }
+    [MaxLength(20)]
+    public string? DownPaymentMethod { get; set; }
     [Range(typeof(decimal), "0", "79228162514264337593543950335")]
     public decimal? InterestRate { get; set; }
     [Required, MinLength(1)]

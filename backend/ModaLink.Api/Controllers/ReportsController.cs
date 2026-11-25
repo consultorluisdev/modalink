@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ModaLink.Api.Data;
+using ModaLink.Api.Common;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -29,7 +30,7 @@ public class ReportsController : ControllerBase
         };
 
         var orders = await _context.Orders
-            .Where(o => o.CreatedAt >= fromDate)
+            .Where(o => o.CreatedAt >= fromDate && o.Status != OrderStatuses.Cancelled)
             .ToListAsync();
 
         var totalVendido = orders.Sum(o => o.Total);
@@ -44,7 +45,7 @@ public class ReportsController : ControllerBase
             .ToList();
 
         var topProducts = await _context.OrderItems
-            .Where(i => i.Order!.CreatedAt >= fromDate)
+            .Where(i => i.Order!.CreatedAt >= fromDate && i.Order.Status != OrderStatuses.Cancelled)
             .GroupBy(i => new { i.ProductId, Name = i.Product!.Title })
             .Select(g => new
             {
@@ -71,17 +72,17 @@ public class ReportsController : ControllerBase
         var monthStart = new DateTime(now.Year, now.Month, 1, 0, 0, 0, DateTimeKind.Utc);
 
         var salesThisMonth = await _context.Orders
-            .Where(o => o.CreatedAt >= monthStart)
+            .Where(o => o.CreatedAt >= monthStart && o.Status != OrderStatuses.Cancelled)
             .SumAsync(o => o.Total);
 
         var ordersThisMonth = await _context.Orders
-            .Where(o => o.CreatedAt >= monthStart)
+            .Where(o => o.CreatedAt >= monthStart && o.Status != OrderStatuses.Cancelled)
             .CountAsync();
 
         var totalProducts = await _context.Products.CountAsync();
         var totalCustomers = await _context.Customers.CountAsync();
         var pendingInstallments = await _context.Installments
-            .Where(i => !i.IsPaid)
+            .Where(i => !i.IsPaid && i.Order!.Status != OrderStatuses.Cancelled)
             .CountAsync();
 
         return Ok(new

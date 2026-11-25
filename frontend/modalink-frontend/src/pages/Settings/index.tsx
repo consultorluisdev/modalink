@@ -167,14 +167,14 @@ const Settings: React.FC = () => {
   };
 
   return (
-    <div className="p-6">
-      <div className="flex items-center gap-3 mb-6">
-        <div className="p-2 bg-blue-100 rounded-lg">
-          <Store className="w-6 h-6 text-blue-600" />
+    <div className="space-y-6">
+      <div className="flex items-center gap-3">
+        <div className="rounded-xl bg-purple-100 p-2.5">
+          <Store className="h-6 w-6 text-indigo-700" />
         </div>
         <div>
-          <h1 className="text-2xl font-bold">Configuracoes</h1>
-          <p className="text-sm text-gray-500">
+          <h1 className="text-2xl font-bold">Configurações</h1>
+          <p className="text-sm text-slate-500">
             Gerencie as configuracoes da sua loja, usuarios e senha.
           </p>
         </div>
@@ -192,12 +192,12 @@ const Settings: React.FC = () => {
         </div>
       )}
 
-      <div className="flex gap-2 border-b mb-6">
+      <div className="flex gap-1 overflow-x-auto border-b border-purple-100">
         <button
           onClick={() => handleTabChange("store")}
           className={`px-4 py-2 text-sm font-medium transition-colors duration-200 ${
             activeTab === "store"
-              ? "text-blue-600 border-b-2 border-blue-600"
+              ? "text-indigo-700 border-b-2 border-indigo-600"
               : "text-gray-500 hover:text-gray-700"
           }`}
         >
@@ -207,7 +207,7 @@ const Settings: React.FC = () => {
           onClick={() => handleTabChange("user")}
           className={`px-4 py-2 text-sm font-medium transition-colors ${
             activeTab === "user"
-              ? "text-blue-600 border-b-2 border-blue-600"
+              ? "text-indigo-700 border-b-2 border-indigo-600"
               : "text-gray-500 hover:text-gray-700"
           }`}
         >
@@ -217,7 +217,7 @@ const Settings: React.FC = () => {
           onClick={() => handleTabChange("password")}
           className={`px-4 py-2 text-sm font-medium transition-colors ${
             activeTab === "password"
-              ? "text-blue-600 border-b-2 border-blue-600"
+              ? "text-indigo-700 border-b-2 border-indigo-600"
               : "text-gray-500 hover:text-gray-700"
           }`}
         >
@@ -227,9 +227,9 @@ const Settings: React.FC = () => {
 
       <div className="max-w-2xl">
         {activeTab === "store" && (
-          <div className="bg-white p-6 rounded-lg border">
+          <div className="rounded-2xl border border-purple-100 bg-white p-5 shadow-sm sm:p-6">
             <h2 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-              <Store size={20} className="text-blue-600" />
+              <Store size={20} className="text-indigo-700" />
               Dados da Loja
             </h2>
             <form onSubmit={handleStoreSubmit} className="space-y-4">
@@ -240,7 +240,7 @@ const Settings: React.FC = () => {
                   name="nome"
                   value={storeData.nome}
                   onChange={handleStoreChange}
-                  className="mt-1 block w-full border rounded-md p-2"
+                  className="mt-1 block w-full border border-purple-100 px-3 py-2.5"
                 />
               </div>
               <div>
@@ -250,7 +250,7 @@ const Settings: React.FC = () => {
                   name="telefone"
                   value={storeData.telefone}
                   onChange={handleStoreChange}
-                  className="mt-1 block w-full border rounded-md p-2"
+                  className="mt-1 block w-full border border-purple-100 px-3 py-2.5"
                 />
               </div>
               <div>
@@ -260,12 +260,12 @@ const Settings: React.FC = () => {
                   name="endereco"
                   value={storeData.endereco}
                   onChange={handleStoreChange}
-                  className="mt-1 block w-full border rounded-md p-2"
+                  className="mt-1 block w-full border border-purple-100 px-3 py-2.5"
                 />
               </div>
               <button
                 type="submit"
-                className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 flex items-center gap-2"
+                className="flex items-center gap-2 rounded-xl bg-indigo-700 px-4 py-2.5 font-semibold text-white shadow-sm transition hover:bg-indigo-800 focus:outline-none focus:ring-2 focus:ring-purple-300"
               >
                 <Save size={16} />
                 Salvar
@@ -276,9 +276,9 @@ const Settings: React.FC = () => {
 
         {activeTab === "user" && (
           <div className="space-y-6">
-            <div className="bg-white p-6 rounded-lg border">
+            <div className="rounded-2xl border border-purple-100 bg-white p-5 shadow-sm sm:p-6">
               <h2 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                <User size={20} className="text-blue-600" />
+                <User size={20} className="text-indigo-700" />
                 Adicionar Usuario
               </h2>
               <form onSubmit={handleAddUser} className="space-y-4">
@@ -289,7 +289,7 @@ const Settings: React.FC = () => {
                     name="nome"
                     value={newUser.nome}
                     onChange={(e) => setNewUser({ ...newUser, nome: e.target.value })}
-                    className="mt-1 block w-full border rounded-md p-2"
+                    className="mt-1 block w-full border border-purple-100 px-3 py-2.5"
                     required
                   />
                 </div>
@@ -300,7 +300,7 @@ const Settings: React.FC = () => {
                     name="email"
                     value={newUser.email}
                     onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
-                    className="mt-1 block w-full border rounded-md p-2"
+                    className="mt-1 block w-full border border-purple-100 px-3 py-2.5"
                     required
                   />
                 </div>
@@ -310,7 +310,7 @@ const Settings: React.FC = () => {
                     type="password"
                     value={newUserPassword}
                     onChange={(e) => setNewUserPassword(e.target.value)}
-                    className="mt-1 block w-full border rounded-md p-2"
+                    className="mt-1 block w-full border border-purple-100 px-3 py-2.5"
                     required
                     minLength={6}
                   />
@@ -321,7 +321,7 @@ const Settings: React.FC = () => {
                     name="perfil"
                     value={newUser.perfil}
                     onChange={(e) => setNewUser({ ...newUser, perfil: e.target.value as PerfilUsuario })}
-                    className="mt-1 block w-full border rounded-md p-2"
+                    className="mt-1 block w-full border border-purple-100 px-3 py-2.5"
                   >
                     <option value="Administrador">Administrador</option>
                     <option value="Vendedor">Vendedor</option>
@@ -330,7 +330,7 @@ const Settings: React.FC = () => {
                 </div>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 flex items-center gap-2"
+                  className="flex items-center gap-2 rounded-xl bg-indigo-700 px-4 py-2.5 font-semibold text-white shadow-sm transition hover:bg-indigo-800 focus:outline-none focus:ring-2 focus:ring-purple-300"
                 >
                   <Save size={16} />
                   Adicionar Usuario
@@ -338,7 +338,7 @@ const Settings: React.FC = () => {
               </form>
             </div>
 
-            <div className="bg-white p-6 rounded-lg border">
+            <div className="rounded-2xl border border-purple-100 bg-white p-5 shadow-sm sm:p-6">
               <h3 className="text-lg font-semibold text-gray-800 mb-4">Usuarios Cadastrados</h3>
               <div className="space-y-2">
                 {users.map((user) => (
@@ -349,7 +349,7 @@ const Settings: React.FC = () => {
                     <div>
                       <p className="font-medium">{user.nome}</p>
                       <p className="text-sm text-gray-500">{user.email}</p>
-                      <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded">
+                      <span className="rounded-full bg-purple-100 px-2 py-0.5 text-xs font-semibold text-indigo-800">
                         {user.perfil}
                       </span>
                     </div>
@@ -371,9 +371,9 @@ const Settings: React.FC = () => {
         )}
 
         {activeTab === "password" && (
-          <div className="bg-white p-6 rounded-lg border">
+          <div className="rounded-2xl border border-purple-100 bg-white p-5 shadow-sm sm:p-6">
             <h2 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-              <Lock size={20} className="text-blue-600" />
+              <Lock size={20} className="text-indigo-700" />
               Alterar Senha
             </h2>
             <form onSubmit={handlePasswordChange} className="space-y-4">
@@ -385,7 +385,7 @@ const Settings: React.FC = () => {
                     name="senhaAtual"
                     value={passwordData.senhaAtual}
                     onChange={handlePasswordInputChange}
-                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full border border-purple-100 px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-purple-300"
                     required
                   />
                   <button
@@ -406,7 +406,7 @@ const Settings: React.FC = () => {
                   name="novaSenha"
                   value={passwordData.novaSenha}
                   onChange={handlePasswordInputChange}
-                  className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full border border-purple-100 px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-purple-300"
                   required
                   minLength={6}
                 />
@@ -418,13 +418,13 @@ const Settings: React.FC = () => {
                   name="confirmarSenha"
                   value={passwordData.confirmarSenha}
                   onChange={handlePasswordInputChange}
-                  className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full border border-purple-100 px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-purple-300"
                   required
                 />
               </div>
               <button
                 type="submit"
-                className="w-full py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center justify-center gap-2 transition-colors"
+                className="flex w-full items-center justify-center gap-2 rounded-xl bg-indigo-700 py-3 font-semibold text-white transition-colors hover:bg-indigo-800"
               >
                 <Key size={18} />
                 Alterar Senha

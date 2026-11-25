@@ -85,7 +85,7 @@ export default function Catalogo() {
           <div className="w-10 h-10 border-4 border-gray-200 border-t-indigo-600 rounded-full animate-spin"></div>
         </div>
       ) : filtered.length === 0 ? (
-        <div className="text-center py-16">
+        <div className="rounded-2xl border border-purple-100 bg-white py-16 text-center shadow-sm">
           <Package size={48} className="text-gray-300 mx-auto mb-3" />
           <p className="text-gray-500 font-medium">Nenhum produto encontrado</p>
         </div>
@@ -94,7 +94,7 @@ export default function Catalogo() {
           {filtered.map((p) => (
             <div
               key={p.id}
-              className="bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-lg transition-shadow group"
+              className="group overflow-hidden rounded-2xl border border-purple-100 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
             >
               <div className="w-full aspect-square bg-gray-100 overflow-hidden">
                 {p.imageUrl ? (

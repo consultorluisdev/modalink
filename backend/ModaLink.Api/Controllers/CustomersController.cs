@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ModaLink.Api.Models;
 using ModaLink.Api.Data;
+using ModaLink.Api.Common;
 using Microsoft.AspNetCore.Http.HttpResults;
 
 [ApiController]
@@ -43,9 +44,10 @@ public class CustomersController : ControllerBase
                 c.Active,
                 c.CreditLimit,
                 c.CreatedAt,
-                TotalOrders = c.Orders.Count,
-                TotalSpent = c.Orders.Sum(o => o.Total),
+                TotalOrders = c.Orders.Count(o => o.Status != OrderStatuses.Cancelled),
+                TotalSpent = c.Orders.Where(o => o.Status != OrderStatuses.Cancelled).Sum(o => o.Total),
                 TotalOwed = c.Orders
+                    .Where(o => o.Status != OrderStatuses.Cancelled)
                     .SelectMany(o => o.Installments)
                     .Where(i => !i.IsPaid)
                     .Sum(i => i.Amount)
@@ -69,12 +71,13 @@ public class CustomersController : ControllerBase
         if (customer == null)
             return NotFound(new { message = "Cliente não encontrado" });
 
-        var totalOwed = customer.Orders
+        var activeOrders = customer.Orders.Where(o => o.Status != OrderStatuses.Cancelled).ToList();
+        var totalOwed = activeOrders
             .SelectMany(o => o.Installments)
             .Where(i => !i.IsPaid)
             .Sum(i => i.Amount);
 
-        var totalSpent = customer.Orders.Sum(o => o.Total);
+        var totalSpent = activeOrders.Sum(o => o.Total);
 
         return Ok(new
         {
@@ -91,7 +94,7 @@ public class CustomersController : ControllerBase
             customer.CreatedAt,
             totalOwed,
             totalSpent,
-            totalOrders = customer.Orders.Count,
+            totalOrders = activeOrders.Count,
             orders = customer.Orders.OrderByDescending(o => o.CreatedAt).Select(o => new
             {
                 o.Id,
@@ -213,4 +216,3 @@ public class CreateCustomerDto
     public string? Notes { get; set; }
     public decimal? CreditLimit { get; set; }
 }
-

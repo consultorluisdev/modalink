@@ -21,10 +21,16 @@ export const orderService = {
         discount?: number;
         installmentCount?: number;
         downPayment?: number;
+        downPaymentMethod?: string;
         interestRate?: number;
         items: { productId: number; productName: string; quantity: number; unitPrice: number }[];
     }) {
         const response = await api.post('/orders', data);
+        return response.data;
+    },
+
+    async cancel(id: number, reason?: string) {
+        const response = await api.post(`/orders/${id}/cancel`, { reason });
         return response.data;
     }
 };

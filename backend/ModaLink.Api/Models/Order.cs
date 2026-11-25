@@ -11,6 +11,8 @@ public class Order
     public decimal Total { get; set; }
     public string Status { get; set; } = "Pending";
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    public DateTime? CancelledAt { get; set; }
+    public string? CancellationReason { get; set; }
     public int? InstallmentCount { get; set; }
     public decimal? DownPayment { get; set; }
     public decimal? InterestRate { get; set; }

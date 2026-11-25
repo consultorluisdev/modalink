@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { createProduct } from "../services/productService";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Upload } from "lucide-react";
+import { Upload } from "lucide-react";
 
 export default function CreateProduct() {
   const navigate = useNavigate();
@@ -54,16 +54,12 @@ export default function CreateProduct() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto">
-      <button
-        onClick={() => navigate("/produtos")}
-        className="flex items-center gap-2 text-gray-600 hover:text-gray-800 mb-6"
-      >
-        <ArrowLeft size={18} />
-        <span className="text-sm">Voltar</span>
-      </button>
-
-      <h1 className="text-2xl font-bold text-gray-800 mb-6">Novo Produto</h1>
+    <div className="mx-auto max-w-2xl">
+      <div className="mb-6">
+        <p className="mb-1 text-xs font-semibold uppercase tracking-[0.14em] text-indigo-700">Estoque</p>
+        <h1 className="text-2xl font-bold text-gray-900">Novo produto</h1>
+        <p className="mt-1 text-sm text-gray-500">Adicione os dados e a imagem do produto.</p>
+      </div>
 
       <form onSubmit={handleSubmit} className="bg-white rounded-xl border border-gray-200 p-6 space-y-5">
         {error && (

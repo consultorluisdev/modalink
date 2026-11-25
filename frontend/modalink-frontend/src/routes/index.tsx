@@ -7,13 +7,16 @@ import PrivateRoute from "../components/PrivateRoute";
 import Products from "../pages/Products";
 import CreateProduct from "../pages/CreateProduct";
 import { Orders } from "../pages/orders/Orders";
+import GestorLojaOnLine from "../pages/GestorLojaOnLine";
 import NovaVenda from "../pages/vendas/NovaVenda";
 import Clientes from "../pages/clientes/Clientes";
 import IAVendas from "../pages/ia-vendas/IAVendas";
 import Catalogo from "../pages/catalogo/Catalogo";
+import LojaOnline from "../pages/LojaOnline";
 import Financeiro from "../pages/financeiro/Financeiro";
 import Reports from "../pages/Reports";
 import Settings from "../pages/Settings";
+import CashRegister from "../pages/CashRegister";
 import MainLayout from "../layouts/MainLayout";
 import api from "../services/api";
 import { useAuth } from "../hooks/useAuth";
@@ -73,6 +76,7 @@ export default function AppRoutes() {
       <Routes>
         <Route path="/login" element={<LoginRoute />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/loja-online" element={<LojaOnline />} />
 
         <Route element={<ProtectedLayout />}>
           <Route path="/dashboard" element={<Dashboard />} />
@@ -83,6 +87,8 @@ export default function AppRoutes() {
           <Route path="/vendas/nova" element={<NovaVenda />} />
           <Route path="/clientes" element={<Clientes />} />
           <Route path="/financeiro" element={<Financeiro />} />
+          <Route path="/caixa" element={<CashRegister />} />
+          <Route path="/gestor-loja-online" element={<GestorLojaOnLine />} />
           <Route path="/ia-vendas" element={<IAVendas />} />
           <Route path="/configuracoes" element={<Settings />} />
           <Route path="/relatorios" element={<Reports />} />

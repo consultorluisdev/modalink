@@ -8,7 +8,7 @@ export default function MainLayout({ children }: { children: ReactNode }) {
   const [collapsed, setCollapsed] = useState(false);
 
   return (
-    <div className="flex h-screen bg-gray-50">
+    <div className="erp-shell flex h-dvh overflow-hidden bg-[#faf8fc]">
       <SideBar
         isOpen={sideBarOpen}
         setIsOpen={setSideBarOpen}
@@ -16,11 +16,13 @@ export default function MainLayout({ children }: { children: ReactNode }) {
         onToggleCollapse={() => setCollapsed(!collapsed)}
       />
 
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
         <TopBar onMenuClick={() => setSideBarOpen(true)} />
 
-        <main className="flex-1 overflow-y-auto p-6">
-          {children}
+        <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
+          <div className="mx-auto w-full max-w-[1600px]">
+            {children}
+          </div>
         </main>
       </div>
     </div>

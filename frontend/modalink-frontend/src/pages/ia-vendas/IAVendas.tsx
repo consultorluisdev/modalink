@@ -37,57 +37,57 @@ const quickActions = [
     label: "Produtos Top",
     question: "Quais produtos mais vendem?",
     icon: Package,
-    color: "text-blue-600",
-    bg: "bg-blue-50",
+    color: "text-indigo-700",
+    bg: "bg-purple-50",
   },
   {
     label: "Dicas Vendas",
     question: "Me dê dicas para aumentar vendas",
     icon: Zap,
-    color: "text-yellow-600",
-    bg: "bg-yellow-50",
+    color: "text-amber-700",
+    bg: "bg-amber-50",
   },
   {
     label: "Desempenho",
     question: "Analise meu desempenho esse mês",
     icon: Activity,
-    color: "text-green-600",
-    bg: "bg-green-50",
+    color: "text-emerald-700",
+    bg: "bg-emerald-50",
   },
   {
     label: "Top Clientes",
     question: "Qual cliente compra mais?",
     icon: Users,
-    color: "text-purple-600",
-    bg: "bg-purple-50",
+    color: "text-indigo-700",
+    bg: "bg-indigo-50",
   },
   {
     label: "Relatórios",
     question: "Gerar relatório de vendas",
     icon: BarChart3,
-    color: "text-indigo-600",
-    bg: "bg-indigo-50",
+    color: "text-violet-700",
+    bg: "bg-violet-50",
   },
   {
     label: "Estoque Baixo",
     question: "Estoque baixo",
     icon: ShoppingCart,
-    color: "text-red-600",
-    bg: "bg-red-50",
+    color: "text-rose-700",
+    bg: "bg-rose-50",
   },
   {
     label: "Metas",
     question: "Metas do mês",
     icon: Target,
-    color: "text-orange-600",
+    color: "text-orange-700",
     bg: "bg-orange-50",
   },
   {
     label: "Fidelidade",
     question: "Me dê dicas para aumentar vendas",
     icon: MessageSquare,
-    color: "text-teal-600",
-    bg: "bg-teal-50",
+    color: "text-purple-700",
+    bg: "bg-purple-50",
   },
 ];
 
@@ -118,14 +118,14 @@ export default function IAVendas() {
   }
 
   return (
-    <div className="h-[calc(100vh-8rem)] flex flex-col gap-4">
+    <div className="flex min-h-[calc(100dvh-8rem)] flex-col gap-4 lg:h-[calc(100dvh-8rem)]">
       <div>
         <h1 className="text-2xl font-bold text-gray-800">IA de Vendas</h1>
         <p className="text-gray-500 text-sm mt-1">Assistente inteligente para impulsionar suas vendas</p>
       </div>
 
-      <div className="flex-1 grid grid-cols-5 gap-4 min-h-0">
-        <div className="col-span-3 flex flex-col bg-white rounded-xl border border-gray-200 overflow-hidden min-h-0">
+      <div className="grid min-h-0 flex-1 grid-cols-1 gap-4 lg:grid-cols-5">
+        <div className="flex min-h-[480px] flex-col overflow-hidden rounded-2xl border border-purple-100 bg-white shadow-sm lg:col-span-3 lg:min-h-0">
           <div className="bg-gradient-to-r from-indigo-600 to-purple-600 px-5 py-3 flex items-center gap-3 shrink-0">
             <div className="w-9 h-9 bg-white/20 rounded-full flex items-center justify-center">
               <Bot size={20} className="text-white" />
@@ -137,7 +137,7 @@ export default function IAVendas() {
             <Sparkles size={18} className="text-yellow-300 ml-auto" />
           </div>
 
-          <div className="flex-1 overflow-y-auto p-4 space-y-4">
+          <div className="flex-1 space-y-4 overflow-y-auto p-4">
             {messages.map((msg, i) => (
               <div key={i} className={`flex gap-3 ${msg.role === "user" ? "justify-end" : ""}`}>
                 {msg.role === "ai" && (
@@ -181,15 +181,15 @@ export default function IAVendas() {
           </div>
         </div>
 
-        <div className="col-span-2 flex flex-col gap-3 overflow-y-auto shrink-0">
-          <div className="bg-white rounded-xl border border-gray-200 p-4">
+        <div className="flex flex-col gap-3 overflow-y-auto lg:col-span-2">
+          <div className="rounded-2xl border border-purple-100 bg-white p-4 shadow-sm">
             <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Ações Rápidas</h3>
             <div className="grid grid-cols-2 gap-2">
               {quickActions.map((action, i) => (
                 <button
                   key={i}
                   onClick={() => handleSend(action.question)}
-                  className={`flex flex-col items-center gap-1.5 p-3 rounded-xl ${action.bg} hover:shadow transition-all`}
+                  className={`flex min-h-20 flex-col items-center justify-center gap-1.5 rounded-xl p-3 transition-all hover:shadow-sm ${action.bg}`}
                 >
                   <action.icon size={18} className={action.color} />
                   <span className="text-xs font-medium text-gray-700 text-center leading-tight">{action.label}</span>
@@ -198,7 +198,7 @@ export default function IAVendas() {
             </div>
           </div>
 
-          <div className="bg-white rounded-xl border border-gray-200 p-4">
+          <div className="rounded-2xl border border-purple-100 bg-white p-4 shadow-sm">
             <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Métricas</h3>
             <div className="space-y-3">
               <div className="bg-gradient-to-r from-indigo-500 to-indigo-600 rounded-xl p-3 text-white">

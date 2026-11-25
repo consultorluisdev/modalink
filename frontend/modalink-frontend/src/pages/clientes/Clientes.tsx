@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import type { FormEvent } from 'react';
-import { Users, Search, ArrowUpRight, ArrowLeft, Check, ChevronRight, Phone, Mail, MessageCircle, Plus, Pencil, AlertCircle, X, Save } from "lucide-react";
+import { Users, Search, ArrowUpRight, Check, ChevronRight, Phone, Mail, MessageCircle, Plus, Pencil, AlertCircle, X, Save } from "lucide-react";
 import { useAuth } from "../../hooks/useAuth";
 import api from "../../services/api";
 
@@ -163,19 +163,11 @@ export default function Clientes() {
     [clientes]
   );
 return (
-  <main className="min-h-full bg-[#f8f7fb] p-4 text-slate-800 sm:p-6 lg:p-8">
-    <div className="mx-auto max-w-[1440px] space-y-6">
+  <div className="space-y-6 text-slate-800">
+    <div className="space-y-6">
       <header className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
-        <button
-          type="button"
-          onClick={() => window.history.back()}
-          className="mb-3 inline-flex items-center gap-2 text-sm font-medium text-slate-600 hover:text-violet-700"
-        >
-          <ArrowLeft size={16} />
-          Voltar
-        </button>
         <div>
-          <div className="mb-1 flex items-center gap-2 text-xs font-medium text-violet-600"></div>
+          <p className="mb-1 text-xs font-semibold uppercase tracking-[0.14em] text-violet-700">Relacionamento</p>
           <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">Clientes</h1>
           <p className="mt-1 text-sm text-slate-500">Acompanhe e gerencie sua base de clientes.</p>
         </div>
@@ -575,7 +567,7 @@ return (
         </div>
       </div>
     )}
-  </main>
+  </div>
 );
 }
 

@@ -4,8 +4,9 @@ interface BadgeProps {
 
 export function Badge({ status }: BadgeProps){
     const variants = {
-        Paid: 'bg-green-100 text-green-700',
-        Pending: 'bg-yellow-100 text-red-700'
+        Paid: 'border border-emerald-200 bg-emerald-50 text-emerald-700',
+        Pending: 'border border-amber-200 bg-amber-50 text-amber-700',
+        Cancelled: 'border border-slate-200 bg-slate-100 text-slate-600'
     };
 
     const labels = {
@@ -18,7 +19,7 @@ export function Badge({ status }: BadgeProps){
     const label = labels[status as keyof typeof labels] || status;
 
     return (
-        <span className={`px-2 py-1 rounded-full text-xs font-medium ${variant}`}>
+        <span className={`inline-flex items-center whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-semibold ${variant}`}>
             {label}
         </span>
     );

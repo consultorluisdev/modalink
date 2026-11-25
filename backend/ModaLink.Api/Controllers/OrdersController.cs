@@ -54,6 +54,7 @@ public class OrdersController : ControllerBase
     public async Task<IActionResult> GetStats()
     {
         var orders = await _context.Orders
+            .Where(o => o.Status != OrderStatuses.Cancelled)
             .Include(o => o.Customer)
             .Include(o => o.Items)
             .ThenInclude(i => i.Product)
@@ -110,6 +111,7 @@ public class OrdersController : ControllerBase
             .Include(o => o.Items)
             .ThenInclude(i => i.Product)
             .Include(o => o.Installments)
+            .Include(o => o.Payments)
             .FirstOrDefaultAsync(o => o.Id == id);
 
         if (order == null)
@@ -127,9 +129,12 @@ public class OrdersController : ControllerBase
             order.Total,
             order.Status,
             order.CreatedAt,
+            order.CancelledAt,
+            order.CancellationReason,
             order.InstallmentCount,
             order.DownPayment,
             order.InterestRate,
+            order.TotalWithInterest,
             Items = order.Items.Select(i => new
             {
                 ProductName = i.Product?.Title ?? "",
@@ -147,8 +152,72 @@ public class OrdersController : ControllerBase
                 i.IsPaid,
                 i.PaidAt,
                 i.PaidAmount
-            })
+            }),
+            Payments = order.Payments
+                .OrderBy(p => p.PaidAt)
+                .Select(p => new
+                {
+                    p.Id,
+                    p.InstallmentId,
+                    p.Amount,
+                    p.Method,
+                    p.PaidAt,
+                    p.ReversedAt
+                })
         });
+    }
+
+    [HttpPost("{id}/cancel")]
+    [Authorize(Roles = "Administrador,Vendedor")]
+    public async Task<IActionResult> Cancel(int id, [FromBody] CancelOrderDto? dto, CancellationToken ct)
+    {
+        var order = await _context.Orders
+            .Include(o => o.Items)
+            .Include(o => o.Payments)
+            .FirstOrDefaultAsync(o => o.Id == id, ct);
+
+        if (order is null)
+            return NotFound(new { message = "Pedido não encontrado" });
+        if (order.Status == OrderStatuses.Cancelled)
+            return Conflict(new { message = "Pedido já está cancelado" });
+
+        await using var transaction = await _context.Database.BeginTransactionAsync(ct);
+        try
+        {
+            foreach (var item in order.Items)
+            {
+                var affected = await _context.Products
+                    .Where(p => p.Id == item.ProductId)
+                    .ExecuteUpdateAsync(update => update
+                        .SetProperty(p => p.Stock, p => p.Stock + item.Quantity)
+                        .SetProperty(p => p.UpdatedAt, _ => DateTime.UtcNow), ct);
+
+                if (affected == 0)
+                {
+                    await transaction.RollbackAsync(ct);
+                    return Conflict(new { message = "Não foi possível devolver um produto ao estoque" });
+                }
+            }
+
+            var now = DateTime.UtcNow;
+            foreach (var payment in order.Payments.Where(p => p.ReversedAt is null))
+                payment.ReversedAt = now;
+
+            order.Status = OrderStatuses.Cancelled;
+            order.CancelledAt = now;
+            order.CancellationReason = string.IsNullOrWhiteSpace(dto?.Reason)
+                ? null
+                : dto.Reason.Trim();
+
+            await _context.SaveChangesAsync(ct);
+            await transaction.CommitAsync(ct);
+            return Ok(new { message = "Pedido cancelado e estoque devolvido com sucesso" });
+        }
+        catch
+        {
+            await transaction.RollbackAsync(ct);
+            throw;
+        }
     }
 
     [HttpPost]
@@ -167,6 +236,7 @@ public class OrdersController : ControllerBase
         var installmentCount = dto.InstallmentCount ?? 0;
         var downPayment = dto.DownPayment ?? 0m;
         var interestRate = dto.InterestRate ?? 0m;
+        var downPaymentMethod = string.Empty;
 
         // 3. Regras de crédito
         if (isCredit)
@@ -177,12 +247,24 @@ public class OrdersController : ControllerBase
                 return BadRequest(new { message = "Entrada não pode ser negativa" });
             if (interestRate < 0)
                 return BadRequest(new { message = "Juros não podem ser negativos" });
+            if (downPayment > 0 &&
+                (!PaymentMethods.TryNormalize(dto.DownPaymentMethod, out downPaymentMethod) ||
+                 downPaymentMethod == PaymentMethods.Crediario))
+                return BadRequest(new { message = "Informe como a entrada do crediário foi recebida" });
         }
         else
         {
-            if (installmentCount != 0 || downPayment != 0 || interestRate != 0)
+            if (installmentCount != 0 || downPayment != 0 || interestRate != 0 || !string.IsNullOrWhiteSpace(dto.DownPaymentMethod))
                 return BadRequest(new { message = "Parcelamento, entrada e juros são exclusivos do crediário" });
         }
+
+        var userId = GetUserId();
+        if (userId is null)
+            return Unauthorized();
+        var cashRegister = await _context.CashRegisters
+            .FirstOrDefaultAsync(register => register.UserId == userId && register.Status == "Open", ct);
+        if (cashRegister is null)
+            return Conflict(new { message = "Abra o caixa antes de registrar uma venda" });
 
         // 4. Produto duplicado no payload
         if (dto.Items.GroupBy(i => i.ProductId).Any(g => g.Count() > 1))
@@ -310,17 +392,16 @@ public class OrdersController : ControllerBase
             }
 
             // 14. Payments de entrada / à vista
-            var userId = GetUserId();
-
             if (isCredit && downPayment > 0)
             {
                 order.Payments.Add(new Payment
                 {
                     InstallmentId = null,
                     Amount = downPayment,
-                    Method = paymentMethod,
+                    Method = downPaymentMethod,
                     PaidAt = DateTime.UtcNow,
                     UserId = userId,
+                    CashRegisterId = cashRegister.Id,
                     ReversedAt = null
                 });
             }
@@ -334,6 +415,7 @@ public class OrdersController : ControllerBase
                     Method = paymentMethod,
                     PaidAt = DateTime.UtcNow,
                     UserId = userId,
+                    CashRegisterId = cashRegister.Id,
                     ReversedAt = null
                 });
             }

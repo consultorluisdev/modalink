@@ -14,6 +14,8 @@ public class AppDbContext : DbContext
     public DbSet<OrderItem> OrderItems { get; set; }
     public DbSet<Installment> Installments { get; set; }
     public DbSet<Payment> Payments { get; set; }
+    public DbSet<CashRegister> CashRegisters { get; set; }
+    public DbSet<CashExpense> CashExpenses { get; set; }
     public DbSet<StoreSetting> StoreSettings { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -77,10 +79,37 @@ public class AppDbContext : DbContext
                 .WithMany(i => i.Payments)
                 .HasForeignKey(p => p.InstallmentId)
                 .OnDelete(DeleteBehavior.SetNull);
+            entity.HasOne(p => p.CashRegister)
+                .WithMany()
+                .HasForeignKey(p => p.CashRegisterId)
+                .OnDelete(DeleteBehavior.SetNull);
             entity.HasIndex(p => p.IdempotencyKey)
                 .IsUnique()
                 .HasFilter("\"IdempotencyKey\" IS NOT NULL");
             entity.HasIndex(p => p.PaidAt);
+        });
+
+        modelBuilder.Entity<CashRegister>(entity =>
+        {
+            entity.Property(register => register.OpeningAmount).HasPrecision(18, 2);
+            entity.Property(register => register.ClosingAmount).HasPrecision(18, 2);
+            entity.HasOne(register => register.User)
+                .WithMany()
+                .HasForeignKey(register => register.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+            entity.HasIndex(register => new { register.UserId, register.Status })
+                .IsUnique()
+                .HasFilter("\"Status\" = 'Open'");
+        });
+
+        modelBuilder.Entity<CashExpense>(entity =>
+        {
+            entity.Property(expense => expense.Amount).HasPrecision(18, 2);
+            entity.Property(expense => expense.Description).HasMaxLength(300);
+            entity.HasOne(expense => expense.CashRegister)
+                .WithMany(register => register.Expenses)
+                .HasForeignKey(expense => expense.CashRegisterId)
+                .OnDelete(DeleteBehavior.Cascade);
         });
     }
 }

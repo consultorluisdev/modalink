@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import {
   AlertTriangle,
-  ArrowLeft,
   CalendarCheck,
   CalendarDays,
   CheckCircle,
@@ -53,6 +52,8 @@ export default function Financeiro() {
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState<FilterType>('Todas');
   const [selectedId, setSelectedId] = useState<number | null>(null);
+  const [paymentAmount, setPaymentAmount] = useState('');
+  const [paymentMethod, setPaymentMethod] = useState('Dinheiro');
 
   async function loadData(isRefresh = false) {
     try {
@@ -79,10 +80,16 @@ export default function Financeiro() {
     void loadData();
   }, []);
 
-  async function handlePay(id: number) {
+  async function handlePay(id: number, outstanding: number) {
+    const amount = Number(paymentAmount.replace(',', '.'));
+    if (!Number.isFinite(amount) || amount <= 0 || amount > outstanding) {
+      setError('Informe um valor positivo que não ultrapasse o saldo da parcela.');
+      return;
+    }
+
     if (
       !window.confirm(
-        'Confirma o recebimento desta parcela? Esta ação registrará a baixa no financeiro.'
+        `Confirma o recebimento de ${formatCurrency(amount)} via ${paymentMethod}?`
       )
     )
       return;
@@ -91,7 +98,7 @@ export default function Financeiro() {
     setError('');
 
     try {
-      await financeiroService.payInstallment(id);
+      await financeiroService.payInstallment(id, amount, paymentMethod);
       await loadData(true);
     } catch {
       setError('Não foi possível registrar o recebimento da parcela.');
@@ -145,6 +152,10 @@ export default function Financeiro() {
 
   const selectedItem = data?.items.find((item) => item.id === selectedId) ?? null;
 
+  useEffect(() => {
+    if (selectedItem) setPaymentAmount(selectedItem.amount.toFixed(2));
+  }, [selectedItem]);
+
   const summaryCards = [
     {
       title: 'A receber',
@@ -197,16 +208,8 @@ export default function Financeiro() {
   }
 
   return (
-    <main className="min-w-0 space-y-6 pb-8">
+    <div className="min-w-0 space-y-6 pb-8">
       <header className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
-        <button
-          type="button"
-          onClick={() => window.history.back()}
-          className="mb-3 inline-flex items-center gap-2 text-sm font-medium text-slate-600 hover:text-violet-700"
-        >
-          <ArrowLeft size={16} />
-          Voltar
-        </button>
         <div>
           <div className="flex items-center gap-2">
             <div className="rounded-xl bg-violet-100 p-2.5">
@@ -404,6 +407,10 @@ export default function Financeiro() {
                             <span className="inline-flex rounded-full bg-emerald-100 px-3 py-1.5 text-xs font-semibold text-emerald-700">
                               Recebida
                             </span>
+                          ) : item.paidAmount && item.paidAmount > 0 ? (
+                            <span className="inline-flex rounded-full bg-violet-100 px-3 py-1.5 text-xs font-semibold text-violet-700">
+                              Parcial
+                            </span>
                           ) : overdue ? (
                             <span className="inline-flex rounded-full bg-red-100 px-3 py-1.5 text-xs font-semibold text-red-700">
                               Vencida
@@ -433,13 +440,12 @@ export default function Financeiro() {
                               type="button"
                               onClick={(event) => {
                                 event.stopPropagation();
-                                void handlePay(item.id);
+                                setSelectedId(item.id);
                               }}
-                              disabled={payingId === item.id}
-                              className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-600 px-3 py-2 text-xs font-semibold text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"
+                              className="inline-flex items-center gap-1.5 rounded-lg bg-violet-600 px-3 py-2 text-xs font-semibold text-white transition hover:bg-violet-700"
                             >
                               <CheckCircle size={13} />
-                              {payingId === item.id ? 'Aguarde...' : 'Receber'}
+                              Receber
                             </button>
                           )}
                         </td>
@@ -507,6 +513,8 @@ export default function Financeiro() {
                   className={`text-sm font-semibold ${
                     selectedItem.isPaid
                       ? 'text-emerald-700'
+                      : selectedItem.paidAmount && selectedItem.paidAmount > 0
+                        ? 'text-violet-700'
                       : isItemOverdue(selectedItem)
                         ? 'text-red-600'
                         : 'text-blue-700'
@@ -514,6 +522,8 @@ export default function Financeiro() {
                 >
                   {selectedItem.isPaid
                     ? 'Recebida'
+                    : selectedItem.paidAmount && selectedItem.paidAmount > 0
+                      ? 'Pagamento parcial'
                     : isItemOverdue(selectedItem)
                       ? 'Vencida'
                       : 'Em aberto'}
@@ -521,15 +531,49 @@ export default function Financeiro() {
               </div>
 
               {!selectedItem.isPaid ? (
-                <button
-                  type="button"
-                  onClick={() => void handlePay(selectedItem.id)}
-                  disabled={payingId === selectedItem.id}
-                  className="flex w-full items-center justify-center gap-2 rounded-xl bg-violet-600 py-3 text-sm font-semibold text-white transition hover:bg-violet-700 disabled:opacity-50"
+                <form
+                  className="space-y-3 border-t border-gray-100 pt-4"
+                  onSubmit={(event) => {
+                    event.preventDefault();
+                    void handlePay(selectedItem.id, selectedItem.amount);
+                  }}
                 >
-                  <CheckCircle size={17} />
-                  {payingId === selectedItem.id ? 'Registrando...' : 'Registrar recebimento'}
-                </button>
+                  <div className="flex items-center justify-between gap-3">
+                    <label htmlFor="installment-payment-amount" className="text-sm font-medium text-gray-600">Valor recebido</label>
+                    <span className="text-xs text-gray-400">Saldo: {formatCurrency(selectedItem.amount)}</span>
+                  </div>
+                  <input
+                    id="installment-payment-amount"
+                    type="number"
+                    min="0.01"
+                    max={selectedItem.amount}
+                    step="0.01"
+                    required
+                    value={paymentAmount}
+                    onChange={(event) => setPaymentAmount(event.target.value)}
+                    className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm"
+                  />
+                  <label htmlFor="installment-payment-method" className="block text-sm font-medium text-gray-600">Forma de recebimento</label>
+                  <select
+                    id="installment-payment-method"
+                    value={paymentMethod}
+                    onChange={(event) => setPaymentMethod(event.target.value)}
+                    className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm"
+                  >
+                    <option value="Dinheiro">Dinheiro</option>
+                    <option value="Pix">Pix</option>
+                    <option value="Cartão">Cartão</option>
+                    <option value="Débito">Débito</option>
+                  </select>
+                  <button
+                    type="submit"
+                    disabled={payingId === selectedItem.id}
+                    className="flex w-full items-center justify-center gap-2 rounded-xl bg-violet-600 py-3 text-sm font-semibold text-white transition hover:bg-violet-700 disabled:opacity-50"
+                  >
+                    <CheckCircle size={17} />
+                    {payingId === selectedItem.id ? 'Registrando...' : 'Registrar recebimento'}
+                  </button>
+                </form>
               ) : (
                 <button
                   type="button"
@@ -557,6 +601,6 @@ export default function Financeiro() {
           )}
         </aside>
       </section>
-    </main>
+    </div>
   );
 }

@@ -44,16 +44,16 @@ export const Register: React.FC = () => {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-100">
-            <div className="max-w-md w-full space-y-8 p-8 bg-white rounded-2xl shadow-lg">
+        <div className="flex min-h-screen items-center justify-center bg-[#faf8fc] px-4 py-8">
+            <div className="w-full max-w-md space-y-8 rounded-3xl border border-purple-100 bg-white p-6 shadow-[0_24px_70px_rgba(47,20,68,0.12)] sm:p-8">
                 {/* HEADER */}
                 <div className="text-center">
-                    <div className="mx-auto w-16 h-16 bg-indigo-600 rounded-2xl flex items-center justify-center mb-4">
+                    <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-[#a52bea] to-[#542080] shadow-lg shadow-purple-900/20">
                         <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                         </svg>
                     </div>
-                    <h1 className="text-3xl font-bold text-indigo-600">ModaLink</h1>
+                    <h1 className="text-3xl font-extrabold tracking-tight text-[#542080]">ModaLink</h1>
                     <p className="mt-1 text-sm text-gray-500">Crie sua conta</p>
                 </div>
                 {/* FORM */}
@@ -128,8 +128,7 @@ export const Register: React.FC = () => {
                     <button
                         type="submit"
                         disabled={loading}
-                        className="w-full py-2 px-4 rounded-lg text-sm font-medium text-white
-                    bg-black hover:bg-gray-800 transition-all duration-200
+                        className="w-full rounded-xl bg-gradient-to-r from-[#8b28cc] to-[#542080] px-4 py-3 text-sm font-bold text-white shadow-md shadow-purple-900/15 transition-all duration-200 hover:-translate-y-0.5 hover:brightness-110
                     disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         {loading ? "Carregando..." : "Cadastrar"}
