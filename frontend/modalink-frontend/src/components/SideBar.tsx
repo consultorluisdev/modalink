@@ -1,5 +1,6 @@
+import { useEffect, useState } from "react";
 import { useAuth } from "../hooks/useAuth";
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 
 import {
   LayoutDashboard,
@@ -17,6 +18,8 @@ import {
   Store,
   DollarSign,
   Banknote,
+  ChevronDown,
+  ExternalLink,
 } from 'lucide-react';
 
 interface SideBarProps {
@@ -30,8 +33,6 @@ const menuItems = [
   { path: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { path: "/vendas/nova", label: "PDV", icon: PlusCircle },
   { path: "/produtos", label: "Estoque", icon: Package },
-  { path: "/gestor-loja-online", label: "Gestor da Loja On-line", icon: Store },
-  { path: "/loja-online", label: "Loja Online", icon: Store },
   { path: "/pedidos", label: "Pedidos", icon: ShoppingCart },
   { path: "/clientes", label: "Clientes", icon: Users },
   { path: "/financeiro", label: "Financeiro", icon: DollarSign },
@@ -43,6 +44,13 @@ const menuItems = [
 
 export default function SideBar({ isOpen, setIsOpen, collapsed, onToggleCollapse }: SideBarProps) {
   const { logout } = useAuth();
+  const { pathname } = useLocation();
+  const isStoreSectionActive = pathname === "/gestor-loja-online" || pathname === "/loja-online";
+  const [storeExpanded, setStoreExpanded] = useState(isStoreSectionActive);
+
+  useEffect(() => {
+    if (isStoreSectionActive) setStoreExpanded(true);
+  }, [isStoreSectionActive]);
 
   return (
     <>
@@ -77,23 +85,77 @@ export default function SideBar({ isOpen, setIsOpen, collapsed, onToggleCollapse
           {!collapsed && <p className="px-5 pb-2 pt-5 text-[10px] font-bold uppercase tracking-[0.16em] text-purple-200/45">Menu principal</p>}
           <nav className={`flex-1 px-3 ${collapsed ? "py-4" : "pb-4"} space-y-1 overflow-y-auto`}>
             {menuItems.map((item) => (
-              <NavLink
-                to={item.path}
-                key={item.path}
-                onClick={() => setIsOpen(false)}
-                className={({ isActive }) => `
-                  flex items-center ${collapsed ? 'justify-center' : 'gap-3'} px-3 py-2.5 ${collapsed ? 'rounded-full w-12 h-12 mx-auto' : 'rounded-lg'} text-sm font-medium
-                    transition-colors duration-200
-                    ${isActive
-                    ? 'bg-gradient-to-r from-[#8b28cc] to-[#7022ad] text-white shadow-[0_5px_16px_rgba(147,51,234,0.22)]'
-                    : 'text-purple-100/65 hover:bg-white/[0.08] hover:text-white'
-                  }
-                  `}
-                title={collapsed ? item.label : undefined}
-              >
-                <item.icon size={20} className="shrink-0" />
-                {!collapsed && <span className="truncate">{item.label}</span>}
-              </NavLink>
+              <div key={item.path}>
+                <NavLink
+                  to={item.path}
+                  onClick={() => setIsOpen(false)}
+                  className={({ isActive }) => `
+                    flex items-center ${collapsed ? 'justify-center' : 'gap-3'} px-3 py-2.5 ${collapsed ? 'rounded-full w-12 h-12 mx-auto' : 'rounded-lg'} text-sm font-medium
+                      transition-colors duration-200
+                      ${isActive
+                      ? 'bg-gradient-to-r from-[#8b28cc] to-[#7022ad] text-white shadow-[0_5px_16px_rgba(147,51,234,0.22)]'
+                      : 'text-purple-100/65 hover:bg-white/[0.08] hover:text-white'
+                    }
+                    `}
+                  title={collapsed ? item.label : undefined}
+                >
+                  <item.icon size={20} className="shrink-0" />
+                  {!collapsed && <span className="truncate">{item.label}</span>}
+                </NavLink>
+                {item.path === "/produtos" && (
+                  <div className="pt-1">
+                    <button
+                      type="button"
+                      aria-expanded={storeExpanded}
+                      aria-controls="store-submenu"
+                      aria-label="Loja online"
+                      onClick={() => setStoreExpanded((expanded) => !expanded)}
+                      title={collapsed ? "Loja online" : undefined}
+                      className={`flex w-full items-center ${collapsed ? "justify-center rounded-full mx-auto w-12 h-12" : "gap-3 rounded-lg px-3"} py-2.5 text-sm font-medium transition-colors duration-200 ${
+                        isStoreSectionActive
+                          ? "bg-gradient-to-r from-[#8b28cc] to-[#7022ad] text-white shadow-[0_5px_16px_rgba(147,51,234,0.22)]"
+                          : "text-purple-100/65 hover:bg-white/[0.08] hover:text-white"
+                      }`}
+                    >
+                      <Store size={20} className="shrink-0" />
+                      {!collapsed && (
+                        <>
+                          <span className="flex-1 truncate text-left">Loja online</span>
+                          <ChevronDown size={16} className={`transition-transform ${storeExpanded ? "rotate-180" : ""}`} />
+                        </>
+                      )}
+                    </button>
+                    {storeExpanded && (
+                      <div id="store-submenu" className={`${collapsed ? "mt-1 space-y-1" : "ml-4 mt-1 space-y-1 border-l border-white/10 pl-3"}`}>
+                        <a
+                          href="/loja-online"
+                          target="_blank"
+                          rel="noreferrer"
+                          onClick={() => setIsOpen(false)}
+                          title={collapsed ? "Abrir loja" : undefined}
+                          className={`flex items-center ${collapsed ? "justify-center rounded-full mx-auto w-12 h-12" : "gap-3 rounded-lg px-3"} py-2 text-xs font-medium text-purple-100/65 transition-colors hover:bg-white/[0.08] hover:text-white`}
+                        >
+                          <ExternalLink size={18} className="shrink-0" />
+                          {!collapsed && <span className="truncate">Abrir loja</span>}
+                        </a>
+                        <NavLink
+                          to="/gestor-loja-online"
+                          onClick={() => setIsOpen(false)}
+                          title={collapsed ? "Gestor da loja" : undefined}
+                          className={({ isActive }) => `flex items-center ${collapsed ? "justify-center rounded-full mx-auto w-12 h-12" : "gap-3 rounded-lg px-3"} py-2 text-xs font-medium transition-colors ${
+                            isActive
+                              ? "bg-white/10 text-white"
+                              : "text-purple-100/65 hover:bg-white/[0.08] hover:text-white"
+                          }`}
+                        >
+                          <Store size={18} className="shrink-0" />
+                          {!collapsed && <span className="truncate">Gestor da loja</span>}
+                        </NavLink>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
             ))}
           </nav>
 

@@ -16,6 +16,7 @@ public class AppDbContext : DbContext
     public DbSet<Payment> Payments { get; set; }
     public DbSet<CashRegister> CashRegisters { get; set; }
     public DbSet<CashExpense> CashExpenses { get; set; }
+    public DbSet<MusicConnection> MusicConnections { get; set; }
     public DbSet<StoreSetting> StoreSettings { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -110,6 +111,19 @@ public class AppDbContext : DbContext
                 .WithMany(register => register.Expenses)
                 .HasForeignKey(expense => expense.CashRegisterId)
                 .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<MusicConnection>(entity =>
+        {
+            entity.Property(connection => connection.Provider).HasMaxLength(20);
+            entity.Property(connection => connection.ProtectedAccessToken).HasMaxLength(4096);
+            entity.Property(connection => connection.ProtectedRefreshToken).HasMaxLength(4096);
+            entity.Property(connection => connection.ExternalUserId).HasMaxLength(200);
+            entity.HasOne(connection => connection.User)
+                .WithMany()
+                .HasForeignKey(connection => connection.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+            entity.HasIndex(connection => new { connection.UserId, connection.Provider }).IsUnique();
         });
     }
 }

@@ -21,6 +21,7 @@ export default function CashRegister() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
+  const [loadFailed, setLoadFailed] = useState(false);
 
   const loadRegister = useCallback(async () => {
     setLoading(true);
@@ -28,9 +29,13 @@ export default function CashRegister() {
     try {
       const current = await cashRegisterService.getCurrent();
       setRegister(current);
+      setLoadFailed(false);
       if (current) setClosingAmount(current.expectedCash.toFixed(2));
-    } catch {
-      setError("Não foi possível carregar o caixa. Tente novamente.");
+    } catch (loadError: unknown) {
+      setLoadFailed(true);
+      setError(loadError instanceof Error
+        ? loadError.message
+        : "Não foi possível carregar o caixa. Tente novamente.");
     } finally {
       setLoading(false);
     }
@@ -99,6 +104,24 @@ export default function CashRegister() {
 
   if (loading) {
     return <div className="flex min-h-64 items-center justify-center"><LoaderCircle className="animate-spin text-indigo-700" size={32} /></div>;
+  }
+
+  if (loadFailed) {
+    return (
+      <div className="mx-auto max-w-2xl space-y-4 rounded-2xl border border-red-200 bg-white p-5 shadow-sm sm:p-7">
+        <div role="alert" className="flex items-start gap-3 rounded-xl bg-red-50 px-4 py-3 text-sm text-red-800">
+          <AlertCircle size={18} className="mt-0.5 shrink-0" />
+          <p>{error}</p>
+        </div>
+        <button
+          type="button"
+          onClick={() => void loadRegister()}
+          className="min-h-11 rounded-xl bg-indigo-700 px-5 font-semibold text-white hover:bg-indigo-800"
+        >
+          Tentar novamente
+        </button>
+      </div>
+    );
   }
 
   return (

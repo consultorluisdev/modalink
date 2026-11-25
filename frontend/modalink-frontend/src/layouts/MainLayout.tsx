@@ -1,6 +1,7 @@
 import { useState } from "react";
 import SideBar from "../components/SideBar";
 import { TopBar } from "../components/TopBar";
+import AmbientMusicPlayer from "../components/AmbientMusicPlayer";
 import type { ReactNode } from "react";
 
 export default function MainLayout({ children }: { children: ReactNode }) {
@@ -25,6 +26,7 @@ export default function MainLayout({ children }: { children: ReactNode }) {
           </div>
         </main>
       </div>
+      <AmbientMusicPlayer />
     </div>
   );
 }

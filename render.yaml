@@ -23,6 +23,28 @@ services:
         value: ModaLinkUsers
       - key: Cors__AllowedOrigins__0
         value: https://modalink-frontend.vercel.app
+      - key: Frontend__BaseUrl
+        value: https://modalink-frontend.vercel.app
+      - key: Music__TokenEncryptionKey
+        sync: false
+      - key: Music__Spotify__ClientId
+        sync: false
+      - key: Music__Spotify__ClientSecret
+        sync: false
+      - key: Music__Spotify__RedirectUri
+        value: https://modalink-api.onrender.com/api/music-connections/spotify/callback
+      - key: Music__YouTube__ClientId
+        sync: false
+      - key: Music__YouTube__ClientSecret
+        sync: false
+      - key: Music__YouTube__RedirectUri
+        value: https://modalink-api.onrender.com/api/music-connections/youtube/callback
+      - key: Music__Deezer__ClientId
+        sync: false
+      - key: Music__Deezer__ClientSecret
+        sync: false
+      - key: Music__Deezer__RedirectUri
+        value: https://modalink-api.onrender.com/api/music-connections/deezer/callback
 
 databases:
   - name: modalink-db

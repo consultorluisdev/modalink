@@ -1,10 +1,14 @@
 import axios from "axios";
 
+const devApiHost = ["localhost", "::1"].includes(window.location.hostname)
+  ? "127.0.0.1"
+  : window.location.hostname;
+
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL
     ? `${String(import.meta.env.VITE_API_URL).replace(/\/$/, "")}/api`
     : import.meta.env.DEV
-      ? `http://${window.location.hostname}:5020/api`
+      ? `http://${devApiHost}:5020/api`
       : "/api",
 });
 

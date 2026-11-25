@@ -34,6 +34,17 @@ services:
       Jwt__Key: ${JWT_KEY}
       Jwt__Issuer: ${JWT_ISSUER}
       Jwt__Audience: ${JWT_AUDIENCE}
+      Frontend__BaseUrl: ${FRONTEND_URL:-http://localhost:5173}
+      Music__TokenEncryptionKey: ${MUSIC_TOKEN_ENCRYPTION_KEY:-}
+      Music__Spotify__ClientId: ${MUSIC_SPOTIFY_CLIENT_ID:-}
+      Music__Spotify__ClientSecret: ${MUSIC_SPOTIFY_CLIENT_SECRET:-}
+      Music__Spotify__RedirectUri: ${MUSIC_SPOTIFY_REDIRECT_URI:-http://localhost:5020/api/music-connections/spotify/callback}
+      Music__YouTube__ClientId: ${MUSIC_YOUTUBE_CLIENT_ID:-}
+      Music__YouTube__ClientSecret: ${MUSIC_YOUTUBE_CLIENT_SECRET:-}
+      Music__YouTube__RedirectUri: ${MUSIC_YOUTUBE_REDIRECT_URI:-http://localhost:5020/api/music-connections/youtube/callback}
+      Music__Deezer__ClientId: ${MUSIC_DEEZER_CLIENT_ID:-}
+      Music__Deezer__ClientSecret: ${MUSIC_DEEZER_CLIENT_SECRET:-}
+      Music__Deezer__RedirectUri: ${MUSIC_DEEZER_REDIRECT_URI:-http://localhost:5020/api/music-connections/deezer/callback}
     depends_on:
       postgres:
         condition: service_healthy

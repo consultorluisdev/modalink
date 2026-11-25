@@ -24,6 +24,10 @@ if (string.IsNullOrWhiteSpace(connectionString))
 // Add services to the container.
 
 builder.Services.AddScoped<ModaLink.Api.Services.OrderStatusService>();
+builder.Services.AddScoped<ModaLink.Api.Services.MusicProviderService>();
+builder.Services.AddScoped<ModaLink.Api.Services.MusicTokenProtector>();
+builder.Services.AddHttpClient();
+builder.Services.AddMemoryCache();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(connectionString));
