@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("ModaLink.Tests")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+930a19bf6fcd552f8a4258500642f0746337bfad")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+e1890ea4e2e27ef4d66b0fca74ab337211e2f5ae")]
 [assembly: System.Reflection.AssemblyProductAttribute("ModaLink.Tests")]
 [assembly: System.Reflection.AssemblyTitleAttribute("ModaLink.Tests")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
